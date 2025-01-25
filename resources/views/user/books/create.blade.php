@@ -2,15 +2,50 @@
 
 @section('content')
     <div class="container mt-4">
-        <div class="row g-4">
+
+        <div class="row">
+            <div class="steps-wrapper">
+                <div class="container pt-2">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-10 col-md-12">
+                            <div class="steps-container">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <div class="step-item text-center">
+                                        <button id="complete-step-1"
+                                                class="i-btn btn--primary btn--sm capsuled step-btn">
+                                            {{ translate("Step 1: Book Details") }}
+                                        </button>
+                                    </div>
+                                    <div class="step-line"></div>
+                                    <div class="step-item text-center">
+                                        <button id="complete-step-2"
+                                                class="i-btn btn--outline btn--sm capsuled step-btn" disabled>
+                                            {{ translate("Step 2: Book Synopsis") }}
+                                        </button>
+                                    </div>
+                                    <div class="step-line"></div>
+                                    <div class="step-item text-center">
+                                        <button id="complete-step-3"
+                                                class="i-btn btn--outline btn--sm capsuled step-btn" disabled>
+                                            {{ translate("Step 3: Book Outline") }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
             <!-- Left Column: Form -->
-            <div class="col-lg-8">
+            <div class="col-lg-12">
                 <form id="generate_data" action="{{route('user.book.manager.store')}}" method="POST">
                     @csrf
                     <div class="i-card-md">
                         <div class="card-header">
                             <h4 class="card--title text-center">{{ translate("Create Your Book") }}</h4>
-                            <p class="text-center fs-14">{{ translate("Fill in the form below and click next to create your book.") }}</p>
+                            <p class="text-center fs-14">{{ translate("Complete the steps to Generate your magical ai book.") }}</p>
                         </div>
                         <div class="card-body">
                             <div id="step1">
@@ -19,30 +54,29 @@
                                     <input type="text" id="title" name="title"/>
                                 </div>
 
-                                <!-- Author Profile -->
-                                <div class="form-group mb-4">
-                                    <label for="authorProfile"
-                                           class="form-label">{{ translate("Author Profile") }}</label>
-                                    <select name="author_profile_id" id="authorProfile" class="form-control">
-                                        @foreach ($authorProfiles as $profile)
-                                            <option value="{{ $profile->id }}">{{ $profile->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    <small
-                                        class="text-muted">{{ translate("Select an author profile for the book.") }}</small>
-                                </div>
-
-
-                                <!-- Genre -->
-                                <div class="form-group mb-4">
-                                    <label for="genre"
-                                           class="form-label">{{ translate("What is the genre of the book?") }}</label>
-                                    <select name="genre_id" id="genre" class="form-control">
-                                        @foreach ($genres as $key => $genre)
-                                            <option value="{{ $key }}">{{ $genre }}</option>
-                                        @endforeach
-                                    </select>
-                                    <small class="text-muted">{{ translate("Select a genre for the book.") }}</small>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-4">
+                                            <label for="authorProfile"
+                                                   class="form-label">{{ translate("Author Profile") }}</label>
+                                            <select name="author_profile_id" id="authorProfile" class="form-control">
+                                                @foreach ($authorProfiles as $profile)
+                                                    <option value="{{ $profile->id }}">{{ $profile->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-4">
+                                            <label for="genre"
+                                                   class="form-label">{{ translate("What is the genre of the book?") }}</label>
+                                            <select name="genre_id" id="genre" class="form-control">
+                                                @foreach ($genres as $key => $genre)
+                                                    <option value="{{ $key }}">{{ $genre }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Purpose -->
@@ -51,8 +85,6 @@
                                            class="form-label">{{ translate("What is the purpose of the book?") }}</label>
                                     <textarea name="purpose" id="purpose" rows="3" class="form-control"
                                               placeholder="{{ translate("Describe the book's purpose.") }}"></textarea>
-                                    <small
-                                        class="text-muted">{{ translate("Explain what the book will contribute to the reader.") }}</small>
                                 </div>
 
                                 <!-- Target Audience -->
@@ -61,38 +93,38 @@
                                            class="form-label">{{ translate("Who is the target audience?") }}</label>
                                     <textarea name="target_audience" id="targetAudience" rows="3" class="form-control"
                                               placeholder="{{ translate("Define the target audience.") }}"></textarea>
-                                    <small
-                                        class="text-muted">{{ translate("Define who this book is written to.") }}</small>
                                 </div>
 
-                                <!-- Length -->
-                                <div class="form-group mb-4">
-                                    <label for="length"
-                                           class="form-label">{{ translate("What is the length of the book?") }}</label>
-                                    <select name="length" id="length" class="form-control">
-                                        <option value="small">{{ translate("Small Book") }}</option>
-                                        <option value="medium">{{ translate("Medium Book") }}</option>
-                                        <option value="large">{{ translate("Large Book") }}</option>
-                                    </select>
-                                    <small class="text-muted">{{ translate("Select a book length.") }}</small>
-                                </div>
 
-                                <!-- Language -->
-                                <div class="form-group mb-4">
-                                    <label for="language"
-                                           class="form-label">{{ translate("What is the language of the book?") }}</label>
-                                    <select name="language" id="language" class="form-control">
-                                        @foreach ($book_languages as $language)
-                                            <option value="{{ $language }}">{{ $language }}</option>
-                                        @endforeach
-                                    </select>
-                                    <small class="text-muted">{{ translate("Select a language for the book.") }}</small>
+                                <!-- Book Length & Language -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-4">
+                                            <label for="length"
+                                                   class="form-label">{{ translate("What is the length of the book?") }}</label>
+                                            <select name="length" id="length" class="form-control">
+                                                <option value="small">{{ translate("Small Book") }}</option>
+                                                <option value="medium">{{ translate("Medium Book") }}</option>
+                                                <option value="large">{{ translate("Large Book") }}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-4">
+                                            <label for="language"
+                                                   class="form-label">{{ translate("What is the language of the book?") }}</label>
+                                            <select name="language" id="language" class="form-control">
+                                                @foreach ($book_languages as $language)
+                                                    <option value="{{ $language }}">{{ $language }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="form-group mb-4">
                                     <button type="button" id="generate_synopsis"
                                             class="i-btn btn--primary btn--sm  step-btn">{{ translate("Generate Synopsis") }}</button>
-                                    <small class="text-muted">{{ translate("key require.") }}</small>
                                 </div>
 
                             </div>
@@ -118,7 +150,6 @@
                                 <div class="form-group mb-4">
                                     <button type="button" id="book_outline"
                                             class="i-btn btn--primary btn--sm  step-btn">{{ translate("Generate Book Outline") }}</button>
-                                    <small class="text-muted">{{ translate("key require.") }}</small>
                                 </div>
 
                             </div>
@@ -129,49 +160,16 @@
                                 <input hidden="hidden" id="chapters" name="chapters" type="text">
                                 <div id="chapters-container"></div>
                                 <button type="submit" id="save_details"
-                                        class="i-btn btn--primary btn--sm  step-btn">{{ translate("Save detals") }}</button>
+                                        class="i-btn btn--primary btn--sm  step-btn">{{ translate("Generate Book Using AI Magic") }}</button>
                             </div>
                         </div>
                     </div>
                 </form>
             </div>
-
-            <!-- Right Column: Steps to Generate Book -->
-            <div class="col-xl-4">
-                <div class="sticky sticky-top">
-
-                    <div class="i-card h-100">
-                        <div class="p-3">
-                            <h4 class="card--title">{{ translate("Steps to Generate Book") }}</h4>
-                            <div class="mb-3 mt-3">
-                                <h5 class="card--title-sm">{{ translate("Step 1: Book Details") }}</h5>
-                                <p class="fs-14">{{ translate("Provide book details like author profile, genre, purpose, and more.") }}</p>
-                                <button id="complete-step-1"
-                                        class="i-btn btn--primary btn--sm capsuled step-btn">{{ translate("Next Step") }}</button>
-                            </div>
-                            <div class="mb-3">
-                                <h5 class="card--title-sm">{{ translate("Step 2: Book Synopsis") }}</h5>
-                                <p class="fs-14">{{ translate("Generate a synopsis for your book with AI assistance.") }}</p>
-                                <button id="complete-step-2" class="i-btn btn--outline btn--sm capsuled step-btn"
-                                        disabled>{{ translate("Locked") }}</button>
-                            </div>
-                            <div class="mb-3">
-                                <h5 class="card--title-sm">{{ translate("Step 3: Book Outline") }}</h5>
-                                <p class="fs-14">{{ translate("Outline the chapters and content structure of your book.") }}</p>
-                                <button id="complete-step-3" class="i-btn btn--outline btn--sm capsuled step-btn"
-                                        disabled>{{ translate("Locked") }}</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 
 @endsection
-<!-- jQuery AJAX Script -->
-<!-- jQuery Script -->
 
 @push('script-push')
 
@@ -186,7 +184,7 @@
 
                 // Disable the button to prevent multiple submissions
                 $('#save_details').prop('disabled', true);
-                $('#save_details').text('{{ translate("Saving...") }}');
+                $('#save_details').text('{{ translate("Doing Magic...") }}');
 
                 // Perform the AJAX POST request
                 $.ajax({
@@ -196,7 +194,7 @@
                     success: function (response) {
                         // Enable the button back and reset the text
                         $('#save_details').prop('disabled', false);
-                        $('#save_details').text('{{ translate("Save details") }}');
+                        $('#save_details').text('{{ translate("Generate Book Using AI Magic") }}');
 
                         // Check if the response indicates success
                         if (response.status) {
@@ -210,7 +208,7 @@
                     error: function (xhr, status, error) {
                         // Handle any errors that occurred during the AJAX request
                         $('#save_details').prop('disabled', false);
-                        $('#save_details').text('{{ translate("Save details") }}');
+                        $('#save_details').text('{{ translate("Generate Book Using AI Magic") }}');
                         alert('{{ translate("An error occurred. Please try again.") }}');
                         console.error("Error: " + error);
                     }
@@ -249,12 +247,12 @@
                             $('#booksynopsis').val(response.data.synopsis);
 
                             // Show step 2
-                            $('#step2').removeClass('d-none').fadeIn();
+                            $('#step1').addClass('d-none');
+                            $('#step2').removeClass('d-none');
                             $('#complete-step-2')
                                 .prop('disabled', false)
                                 .removeClass('btn--outline')
-                                .addClass('btn--primary')
-                                .text('Next Step');
+                                .addClass('btn--primary');
                         } else {
                             alert(response.message || '{{ translate("Something went wrong. Please try again.") }}');
                         }
@@ -290,12 +288,12 @@
                         if (response.status) {
 
                             // Show step 3
-                            $('#step3').removeClass('d-none').fadeIn();
+                            $('#step3').removeClass('d-none');
+                            $('#step2').addClass('d-none');
                             $('#complete-step-3')
                                 .prop('disabled', false)
                                 .removeClass('btn--outline')
-                                .addClass('btn--primary')
-                                .text('Next Step');
+                                .addClass('btn--primary');
                             if (response.data.length > 0) {
                                 $('#chapters-container').empty(); // Clear existing content
 

@@ -47,7 +47,112 @@
     font-size: 14px;
     padding: 5px 15px;
 }
+.step-item {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
+.step-line {
+    flex: 1;
+    width: 5rem;
+    height: 2px;
+    background: #ccc;
+    margin: 0 auto;  /* Center the step lines */
+}
+
+.step-btn {
+    width: 100%;
+    max-width: 200px; /* Limit button width for better design */
+    padding: 8px 16px; /* Slightly larger padding for better touch */
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.step-btn:hover {
+    background: #f0f0f0;
+}
+
+/* Keep steps fixed at the top with proper alignment */
+.steps-wrapper {
+    background: var(--card-bg-light);
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+/* Centering Steps and Keeping Inside Layout */
+.steps-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap; /* Ensure wrapping on smaller screens */
+    margin: auto;
+    text-align: center;
+    max-width: 1200px; /* Prevent stretching on larger screens */
+    padding: 20px;
+}
+
+/* Responsive Fixes */
+@media (max-width: 992px) {
+    .steps-container {
+        width: 100%;
+        padding: 15px;
+    }
+
+    .step-btn {
+        max-width: 180px;
+        padding: 7px 14px;
+    }
+}
+
+@media (max-width: 768px) {
+    .steps-container {
+        flex-direction: column;
+        align-items: center;
+        padding: 15px;
+    }
+
+    .step-item {
+        margin-bottom: 10px;
+        flex-direction: column;
+    }
+
+    .step-line {
+        display: none; /* Hide step line on smaller screens */
+    }
+
+    .step-btn {
+        width: auto; /* Let button size adapt naturally */
+    }
+}
+
+/* Extra Small Screens (Phones) */
+@media (max-width: 480px) {
+    .steps-container {
+        padding: 10px;
+    }
+
+    .step-btn {
+        width: 100%; /* Make buttons full width for better usability */
+    }
+}
+
+/* Scrollable Content */
+.scrollable-content {
+    overflow-y: auto;
+    max-height: 70vh; /* Ensures scrolling instead of hiding content */
+    padding: 15px;
+    border-radius: 10px;
+}
 
 .avatar-16 {
     width: 16rem;
