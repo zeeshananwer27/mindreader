@@ -27,16 +27,20 @@ class AuthorProfileController extends Controller
     /**
      * Edit an author profile.
      *
-     * @param int $id
+     * @param string $id
      * @return View
      */
-    public function edit(int $id): View
+    public function edit(string $id): View
     {
-        $profile = AuthorProfile::where('id', $id)->where('user_id', auth_user('web')->id)->firstOrFail();
+        $author = AuthorProfile::where('uid', $id)->where('user_id', auth_user('web')->id)->firstOrFail();
+        $tones = getToneList();
+        $styles = getWritingStyles();
 
         return view('user.author_profile.edit', [
             'meta_data' => $this->metaData(['title' => 'Edit Author Profile']),
-            'profile' => $profile,
+            'author' => $author,
+            'tones' => $tones,
+            'styles' => $styles,
         ]);
     }
 
@@ -44,10 +48,10 @@ class AuthorProfileController extends Controller
      * Update an author profile.
      *
      * @param Request $request
-     * @param int $id
+     * @param string $id
      * @return RedirectResponse
      */
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(Request $request, string $id): RedirectResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -57,7 +61,7 @@ class AuthorProfileController extends Controller
             'image' => 'nullable|image|max:2048',
         ]);
 
-        $profile = AuthorProfile::where('id', $id)->where('user_id', auth_user('web')->id)->firstOrFail();
+        $profile = AuthorProfile::where('uid', $id)->where('user_id', auth_user('web')->id)->firstOrFail();
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('author_profiles', 'public');
@@ -65,7 +69,7 @@ class AuthorProfileController extends Controller
 
         $profile->update($validated);
 
-        return redirect()->route('author.profile.list')->with('success', 'Author profile updated successfully.');
+        return redirect()->route('user.book.author.list')->with('success', 'Author profile updated successfully.');
     }
 
     /**
@@ -92,7 +96,7 @@ class AuthorProfileController extends Controller
 
         AuthorProfile::create($validated);
 
-        return redirect()->route('author.profile.list')->with('success', 'Author profile created successfully.');
+        return redirect()->route('user.book.author.list')->with('success', 'Author profile created successfully.');
     }
 
     /**
@@ -116,22 +120,25 @@ class AuthorProfileController extends Controller
      *
      * @return View
      */
-    public function show(): View
+    public function show(string $id): View
     {
-        return view('user.author_profile.create', [
-            'meta_data' => $this->metaData(['title' => 'Create Author Profile']),
+        $author = AuthorProfile::where('uid', $id)->where('user_id', auth_user('web')->id)->firstOrFail();
+
+        return view('user.author_profile.show', [
+            'meta_data' => $this->metaData(['title' => 'View Author Profile']),
+            'author' => $author,
         ]);
     }
 
     /**
      * Delete an author profile.
      *
-     * @param int $id
+     * @param string $id
      * @return RedirectResponse
      */
-    public function destroy(int $id): RedirectResponse
+    public function destroy(string $id): RedirectResponse
     {
-        $profile = AuthorProfile::where('id', $id)->where('user_id', auth_user('web')->id)->firstOrFail();
+        $profile = AuthorProfile::where('uid', $id)->where('user_id', auth_user('web')->id)->firstOrFail();
         $profile->delete();
 
         return back()->with('success', 'Author profile deleted successfully.');

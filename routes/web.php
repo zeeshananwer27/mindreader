@@ -312,8 +312,8 @@ Route::middleware($globalMiddleware)->group(function () {
                 Route::post('/store', 'store')->name('store'); // Store a new author profile
                 Route::get('/edit/{id}', 'edit')->name('edit'); // Edit an existing author profile
                 Route::get('/view/{id}', 'show')->name('show'); // Edit an existing author profile
-                Route::post('/update/{id}', 'update')->name('update'); // Update an author profile
-                Route::get('/destroy/{id}', 'destroy')->name('destroy'); // Delete an author profile
+                Route::put('/update/{id}', 'update')->name('update'); // Update an author profile
+                Route::delete('/destroy/{id}', 'destroy')->name('destroy'); // Delete an author profile
             });
         });
 

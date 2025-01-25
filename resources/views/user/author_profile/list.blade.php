@@ -38,17 +38,24 @@
                         <div class="col-md-4 mb-4">
                             <div class="card shadow-md">
                                 <div class="card-body text-center">
-                                    <div class="d-flex flex-column align-items-center">
+                                    <div class="d-flex flex-column align-items-center  mb-3">
                                         @if ($author->image)
-                                            <img src="{{ $author->image }}" alt="{{ $author->name }}"
-                                                 class="rounded-circle-text rounded-circle shadow-md mb-3">
+                                            <img src="{{  asset('storage/' . $author->image) }}"
+                                                 alt="{{ $author->name }}"
+                                                 class="rounded-circle-text rounded-circle shadow-md">
                                         @else
                                             <div
-                                                class="rounded-circle-text rounded-circle shadow-md d-flex align-items-center justify-content-center bg-secondary text-white mb-3">
+                                                class="rounded-circle-text rounded-circle shadow-md d-flex align-items-center justify-content-center bg-secondary text-white">
                                                 {{ strtoupper(substr($author->name, 0, 1)) }}
                                             </div>
                                         @endif
-                                        <h5 class="card-title">{{ $author->name }}</h5>
+                                        <h5 class="card-title mb-3">{{ $author->name }}</h5>
+
+                                        <div class="d-flex flex-row gap-4 mb-3">
+                                            <div class="badge bg-primary text-white">{{ $author->style }}</div>
+                                            <div class="badge bg-dark text-white">{{ $author->style }}</div>
+                                        </div>
+
                                         <p class="text-muted text-center" style="min-height: 100px;">
                                             <span
                                                 class="short-text">{{ Str::limit($author->biography, 150, '...') }}</span>
@@ -61,11 +68,11 @@
 
                                     </div>
                                     <div class="mt-3 d-flex justify-content-center gap-2">
-                                        <a href="{{ route('user.book.author.edit', $author->id) }}"
+                                        <a href="{{ route('user.book.author.edit', $author->uid) }}"
                                            class="btn btn-sm btn-outline-primary">
                                             <i class="bi bi-pencil"></i> Edit Profile
                                         </a>
-                                        <form action="{{ route('user.book.author.destroy', $author->id) }}"
+                                        <form action="{{ route('user.book.author.destroy', $author->uid) }}"
                                               method="POST"
                                               onsubmit="return confirm('Are you sure?');">
                                             @csrf
@@ -74,8 +81,8 @@
                                                 <i class="bi bi-trash"></i> Delete
                                             </button>
                                         </form>
-                                        <a href="{{ route('user.book.author.show', $author->id) }}"
-                                           class="btn btn-sm btn-outline-info">
+                                        <a href="{{ route('user.book.author.show', $author->uid) }}"
+                                           class="btn btn-sm btn-outline-dark">
                                             <i class="bi bi-eye"></i> View Page
                                         </a>
                                     </div>
