@@ -2,38 +2,9 @@
 
 @section('content')
     <div class="container mt-4">
-
-        <div class="row">
-            <div class="steps-wrapper">
-                <div class="container pt-2">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-10 col-md-12">
-                            <div class="steps-container">
-                                <div class="d-flex justify-content-center align-items-center">
-                                    <div class="step-item text-center">
-                                        <button id="complete-step-1"
-                                                class="i-btn btn--primary btn--sm capsuled step-btn">
-                                            {{ translate("1: Book Details") }}
-                                        </button>
-                                    </div>
-                                    <div class="step-line"></div>
-                                    <div class="step-item text-center">
-                                        <button id="complete-step-2"
-                                                class="i-btn btn--outline btn--sm capsuled step-btn" disabled>
-                                            {{ translate("2: Book Synopsis") }}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mt-5">
+        <div class="row g-4">
             <!-- Left Column: Form -->
-            <div class="col-lg-12">
+            <div class="col-lg-8">
                 <form id="generate_data" method="POST">
                     @csrf
                     <div class="i-card-md">
@@ -52,40 +23,41 @@
                                             <option value="{{ $profile->id }}">{{ $profile->name }}</option>
                                         @endforeach
                                     </select>
+                                    <small
+                                        class="text-muted">{{ translate("Select an author profile for the book.") }}</small>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <!-- Language -->
-                                        <div class="form-group mb-4">
-                                            <label for="language"
-                                                   class="form-label">{{ translate("What is the language of the book?") }}</label>
-                                            <select name="language" id="language" class="form-control">
-                                                @foreach ($book_languages as $language)
-                                                    <option value="{{ $language }}">{{ $language }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <!-- Personal -->
-                                        <div class="form-group mb-4">
-                                            <label for="isPersonal"
-                                                   class="form-label">{{ translate("Is this book for you personally or your audience?") }}</label>
-                                            <select name="isPersonal" id="isPersonal" class="form-control">
-                                                <option value="audience">{{ translate("Audience") }}</option>
-                                                <option value="personal">{{ translate("Personal") }}</option>
-                                            </select>
-                                        </div>
-                                    </div>
+                                <!-- Language -->
+                                <div class="form-group mb-4">
+                                    <label for="language"
+                                           class="form-label">{{ translate("What is the language of the book?") }}</label>
+                                    <select name="language" id="language" class="form-control">
+                                        @foreach ($book_languages as $language)
+                                            <option value="{{ $language }}">{{ $language }}</option>
+                                        @endforeach
+                                    </select>
+                                    <small class="text-muted">{{ translate("Select a language for the book.") }}</small>
                                 </div>
 
-                                <!-- Change -->
+                                <!-- Personal -->
+                                <div class="form-group mb-4">
+                                    <label for="isPersonal"
+                                           class="form-label">{{ translate("Is this book for you personally or your audience?") }}</label>
+                                    <select name="isPersonal" id="isPersonal" class="form-control">
+                                        <option value="audience">{{ translate("Audience") }}</option>
+                                        <option value="personal">{{ translate("Personal") }}</option>
+                                    </select>
+                                    <small class="text-muted">{{ translate("Select a book generated for.") }}</small>
+                                </div>
+
+                                <!-- change -->
                                 <div class="form-group mb-4">
                                     <label for="change"
                                            class="form-label">{{ translate("What do you want changed about this book?") }}</label>
                                     <textarea name="change" id="change" rows="3" class="form-control"
                                               placeholder="{{ translate("An example might be to educate and inform college students on how to find a job out of college.") }}"></textarea>
+                                    <small
+                                        class="text-muted">{{ translate("Please describe the changes you wanted to make to the existing book.") }}</small>
                                 </div>
 
                                 <!-- Target Audience -->
@@ -94,11 +66,14 @@
                                            class="form-label">{{ translate("Who is the target audience?") }}</label>
                                     <textarea name="target_audience" id="targetAudience" rows="3" class="form-control"
                                               placeholder="{{ translate("Define the target audience.") }}"></textarea>
+                                    <small
+                                        class="text-muted">{{ translate("Define who this book is written to.") }}</small>
                                 </div>
 
                                 <div class="form-group mb-4">
                                     <button type="button" id="generate_synopsis"
                                             class="i-btn btn--primary btn--sm  step-btn">{{ translate("Generate Synopsis") }}</button>
+                                    <small class="text-muted">{{ translate("key require.") }}</small>
                                 </div>
 
                             </div>
@@ -106,27 +81,30 @@
                             <div id="step2" class="d-none">
                                 <div class="form-group mb-4">
                                     <label for="title" class="form-label">{{ translate("Book Title") }}</label>
-                                    <input type="text" id="title" name="title" class="form-control"/>
+                                    <input type="text" id="title" name="title"/>
                                 </div>
 
-                                <!-- About Author -->
+                                <!-- About Auther -->
                                 <div class="form-group mb-4">
                                     <label for="aboutauther" class="form-label">{{ translate("About Author:") }}</label>
                                     <textarea name="aboutauther" id="aboutauther" rows="5" class="form-control"
                                               placeholder="{{ translate("Details about author.") }}"></textarea>
+
                                 </div>
 
-                                <!-- Book Synopsis -->
+                                <!-- book synopsis -->
                                 <div class="form-group mb-4">
                                     <label for="booksynopsis"
                                            class="form-label">{{ translate("Book Synopsis:") }}</label>
                                     <textarea name="booksynopsis" id="booksynopsis" rows="7" class="form-control"
                                               placeholder="{{ translate("Details about book.") }}"></textarea>
+
                                 </div>
 
                                 <div class="form-group mb-4">
                                     <button type="button" id="book_outline"
                                             class="i-btn btn--primary btn--sm  step-btn">{{ translate("Generate Book Outline") }}</button>
+                                    <small class="text-muted">{{ translate("key require.") }}</small>
                                 </div>
 
                             </div>
@@ -134,16 +112,42 @@
                     </div>
                 </form>
             </div>
+
+            <!-- Right Column: Steps to Generate Book -->
+            <div class="col-xl-4">
+                <div class="sticky sticky-top">
+
+                    <div class="i-card h-100">
+                        <div class="p-3">
+                            <h4 class="card--title">{{ translate("Steps to Recreate Book") }}</h4>
+                            <div class="mb-3 mt-3">
+                                <h5 class="card--title-sm">{{ translate("Step 1: Book Details") }}</h5>
+                                <p class="fs-14">{{ translate("Provide book details like author profile, purpose, and more.") }}</p>
+                                <button id="complete-step-1"
+                                        class="i-btn btn--primary btn--sm capsuled step-btn">{{ translate("Next Step") }}</button>
+                            </div>
+                            <div class="mb-3">
+                                <h5 class="card--title-sm">{{ translate("Step 2: Book Synopsis") }}</h5>
+                                <p class="fs-14">{{ translate("Generate a synopsis for your book with AI assistance.") }}</p>
+                                <button id="complete-step-2" class="i-btn btn--outline btn--sm capsuled step-btn"
+                                        disabled>{{ translate("Locked") }}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
 @endsection
+<!-- jQuery AJAX Script -->
+<!-- jQuery Script -->
 
 @push('script-push')
 
     <script nonce="{{ csp_nonce() }}">
         $(document).ready(function () {
-
             $('#generate_synopsis').on('click', function () {
                 // Collect form data
                 let formData = {
@@ -158,8 +162,7 @@
                 };
 
                 // Disable button and show loading state
-                $('#generate_synopsis').prop('disabled', true);
-                showLoadingSwal("{{translate('Generating synopsis only for you')}}");
+                $('#generate_synopsis').prop('disabled', true).text('{{ translate("Generating...") }}');
 
                 // Perform AJAX request
                 $.ajax({
@@ -167,8 +170,7 @@
                     type: 'POST',
                     data: formData,
                     success: function (response) {
-                        $('#generate_synopsis').prop('disabled', false);
-                        hideLoadingSwal();
+                        $('#generate_synopsis').prop('disabled', false).text('{{ translate("Generate Synopsis") }}');
 
                         if (response.status) {
                             // Populate the synopsis field in step 2
@@ -177,21 +179,19 @@
                             $('#booksynopsis').val(response.data.synopsis);
 
                             // Show step 2
-                            $('#step2').removeClass('d-none');
-                            $('#step1').addClass('d-none');
-
+                            $('#step2').removeClass('d-none').fadeIn();
                             $('#complete-step-2')
                                 .prop('disabled', false)
                                 .removeClass('btn--outline')
-                                .addClass('btn--primary');
+                                .addClass('btn--primary')
+                                .text('Next Step');
                         } else {
-                            $('#book_outline').prop('disabled', false);
+                            $('#book_outline').prop('disabled', false).text('{{ translate("Generate Book Outline") }}');
                             toastr(response.message || '{{ translate("Something went wrong. Please try again.") }}', 'danger')
                         }
                     },
                     error: function (xhr, status, error) {
-                        $('#book_outline').prop('disabled', false);
-                        hideLoadingSwal();
+                        $('#book_outline').prop('disabled', false).text('{{ translate("Generate Book Outline") }}');
                         toastr('{{ translate("An error occurred. Please try again") }}', 'danger')
                         console.error("Error: " + error);
                     }
@@ -215,8 +215,7 @@
                 };
 
                 // Disable button and show loading state
-                $('#book_outline').prop('disabled', true);
-                showLoadingSwal("{{translate('Doing Magic')}}");
+                $('#book_outline').prop('disabled', true).text('{{ translate("Generating...") }}');
 
                 // Perform AJAX request
                 $.ajax({
@@ -224,8 +223,7 @@
                     type: 'POST',
                     data: formData,
                     success: function (response) {
-                        $('#book_outline').prop('disabled', false);
-                        hideLoadingSwal();
+                        $('#book_outline').prop('disabled', false).text('{{ translate("Generate Book Outline") }}');
 
                         if (response.status) {
                             toastr(response.message, 'success')
@@ -235,9 +233,7 @@
                         }
                     },
                     error: function (xhr, status, error) {
-                        $('#book_outline').prop('disabled', false);
-
-                        hideLoadingSwal();
+                        $('#book_outline').prop('disabled', false).text('{{ translate("Generate Book Outline") }}');
                         toastr('{{ translate("An error occurred. Please try again") }}', 'danger')
                         console.error("Error: " + error);
                     }
@@ -247,3 +243,4 @@
         });
     </script>
 @endpush
+
