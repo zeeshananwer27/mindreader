@@ -151,8 +151,16 @@ class AiTemplateSeeder extends Seeder
                         'type' => 'text',
                         'validation' => 'required',
                     ],
+                    'title' => [
+                        'instraction' => 'title',
+                        'field_name' => 'title',
+                        'field_label' => 'title',
+                        'type' => 'text',
+                        'validation' => 'required',
+                    ],
                 ]),
                 'custom_prompt' => 'create book introduction page and chapters with outlines using following details of book:-
+                Title of book is: "{title}"
                 Synopsis of book is: "{synopsis}"
                 author details of book is:"{author}"',
                 'total_words' => 0,

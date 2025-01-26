@@ -161,70 +161,7 @@ class AiService
         }
 
         $aiParams = ['model' => 'gpt-3.5-turbo'];
-        $language = $data['language'];
-        if ($language != 'English') {
-            $customPrompt .= " \n The language is $language. ";
-        }
-
-        $aiParams['messages'] = [[
-            "role" => "user",
-            "content" => $customPrompt
-        ]];
-        return $this->generateContent($aiParams, $logData);
-
-    }
-
-    public function generatreContent(Request $request, AiTemplate $template): array
-    {
-        $logData ['template_id'] = $template->id;
-
-        $logData['admin_id'] = request()->routeIs('admin.*')
-            ? auth_user('admin')?->id
-            : null;
-
-        $logData['user_id'] = request()->routeIs('user.*')
-            ? auth_user('web')?->id
-            : null;
-
-        $customPrompt = $template->custom_prompt;
-
-        if ($request->input("custom") && $template->prompt_fields) {
-            foreach ($template->prompt_fields as $key => $input) {
-                $customPrompt = str_replace("{" . $key . "}", Arr::get($request->input("custom"), $key, "",), $customPrompt);
-            }
-        }
-
-        $getBadWords = site_settings('ai_bad_words');
-
-        $processBadWords = $getBadWords
-            ? explode(",", $getBadWords)
-            : [];
-
-        if (is_array($processBadWords)) {
-            $customPrompt = str_replace($processBadWords, "", $customPrompt);
-        }
-
-
-        // $aiParams = [ 'model'             => $this->getAiModel()];
-        $aiParams = ['model' => 'gpt-3.5-turbo'];
-
-        $aiTone = $request->input("content_tone")
-            ? $request->input("content_tone")
-            : site_settings("ai_default_tone");
-
-        $tokens = (int)($request->input("max_result")
-            ? $request->input("max_result")
-            : site_settings("default_max_result", -1));
-
-
-        $language = $request->input("language");
-
-//
-//        if ($tokens !== PlanDuration::UNLIMITED->value) {
-//            $customPrompt .= " Maximum length is $tokens. ";
-//        }
-
-
+        $language = $data['language'] ?? "English";
         if ($language != 'English') {
             $customPrompt .= " \n The language is $language. ";
         }
@@ -326,6 +263,69 @@ class AiService
             "status" => $status,
             "message" => $message,
         ];
+
+    }
+
+    public function generatreContent(Request $request, AiTemplate $template): array
+    {
+        $logData ['template_id'] = $template->id;
+
+        $logData['admin_id'] = request()->routeIs('admin.*')
+            ? auth_user('admin')?->id
+            : null;
+
+        $logData['user_id'] = request()->routeIs('user.*')
+            ? auth_user('web')?->id
+            : null;
+
+        $customPrompt = $template->custom_prompt;
+
+        if ($request->input("custom") && $template->prompt_fields) {
+            foreach ($template->prompt_fields as $key => $input) {
+                $customPrompt = str_replace("{" . $key . "}", Arr::get($request->input("custom"), $key, "",), $customPrompt);
+            }
+        }
+
+        $getBadWords = site_settings('ai_bad_words');
+
+        $processBadWords = $getBadWords
+            ? explode(",", $getBadWords)
+            : [];
+
+        if (is_array($processBadWords)) {
+            $customPrompt = str_replace($processBadWords, "", $customPrompt);
+        }
+
+
+        // $aiParams = [ 'model'             => $this->getAiModel()];
+        $aiParams = ['model' => 'gpt-3.5-turbo'];
+
+        $aiTone = $request->input("content_tone")
+            ? $request->input("content_tone")
+            : site_settings("ai_default_tone");
+
+        $tokens = (int)($request->input("max_result")
+            ? $request->input("max_result")
+            : site_settings("default_max_result", -1));
+
+
+        $language = $request->input("language");
+
+//
+//        if ($tokens !== PlanDuration::UNLIMITED->value) {
+//            $customPrompt .= " Maximum length is $tokens. ";
+//        }
+
+
+        if ($language != 'English') {
+            $customPrompt .= " \n The language is $language. ";
+        }
+
+        $aiParams['messages'] = [[
+            "role" => "user",
+            "content" => $customPrompt
+        ]];
+        return $this->generateContent($aiParams, $logData);
 
     }
 

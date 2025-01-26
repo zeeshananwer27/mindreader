@@ -130,19 +130,20 @@
                             </div>
 
                             <div id="step2" class="d-none">
-                                <!-- About Auther -->
+                                <!-- About Author -->
                                 <div class="form-group mb-4">
-                                    <label for="aboutauther" class="form-label">{{ translate("About Auther:") }}</label>
-                                    <textarea name="aboutauther" id="aboutauther" rows="5" class="form-control"
-                                              placeholder="{{ translate("Details about auther.") }}"></textarea>
+                                    <label for="about_author"
+                                           class="form-label">{{ translate("About Author:") }}</label>
+                                    <textarea name="about_author" id="about_author" rows="5" class="form-control"
+                                              placeholder="{{ translate("Details about Author.") }}"></textarea>
 
                                 </div>
 
                                 <!-- book synopsis -->
                                 <div class="form-group mb-4">
-                                    <label for="booksynopsis"
+                                    <label for="book_synopsis"
                                            class="form-label">{{ translate("Book Synopsis:") }}</label>
-                                    <textarea name="booksynopsis" id="booksynopsis" rows="7" class="form-control"
+                                    <textarea name="book_synopsis" id="book_synopsis" rows="7" class="form-control"
                                               placeholder="{{ translate("Details about book.") }}"></textarea>
 
                                 </div>
@@ -157,8 +158,13 @@
                             <div id="step3" class="d-none">
 
                                 <h6 class="mt-3">Book Details:</h6>
-                                <input hidden="hidden" id="chapters" name="chapters" type="text">
-                                <div id="chapters-container"></div>
+
+                                <button type="button" id="add-chapter" class="btn btn-primary">Add Chapter</button>
+
+                                <div id="chapters-container">
+                                    <!-- Chapters will be appended here dynamically -->
+                                </div>
+
                                 <button type="submit" id="save_details"
                                         class="i-btn btn--primary btn--sm  step-btn">{{ translate("Generate Book Using AI Magic") }}</button>
                             </div>
@@ -175,6 +181,7 @@
 
     <script nonce="{{ csp_nonce() }}">
         $(document).ready(function () {
+            let chapterCount = 0;
 
             $('#generate_synopsis').on('click', function () {
                 // Collect form data
@@ -204,8 +211,9 @@
                         hideLoadingSwal();
                         if (response.status) {
                             // Populate the synopsis field in step 2
-                            $('#aboutauther').val(response.data.author);
-                            $('#booksynopsis').val(response.data.synopsis);
+                            $('#title').val(response.data.title);
+                            $('#about_author').val(response.data.author);
+                            $('#book_synopsis').val(response.data.synopsis);
 
                             // Show step 2
                             $('#step1').addClass('d-none');
@@ -231,8 +239,10 @@
 
                 // Collect form data
                 let formData = {
-                    aboutauther: $('#aboutauther').val(),
-                    booksynopsis: $('#booksynopsis').val(),
+                    about_author: $('#about_author').val(),
+                    book_synopsis: $('#book_synopsis').val(),
+                    title: $('#title').val(),
+                    language: $('#language').val(),
                     _token: '{{ csrf_token() }}'  // Include CSRF token for Laravel security
                 };
 
@@ -247,9 +257,7 @@
                     success: function (response) {
                         $('#book_outline').prop('disabled', false);
                         hideLoadingSwal();
-
                         if (response.status) {
-
                             // Show step 3
                             $('#step3').removeClass('d-none');
                             $('#step2').addClass('d-none');
@@ -257,36 +265,10 @@
                                 .prop('disabled', false)
                                 .removeClass('btn--outline')
                                 .addClass('btn--primary');
-                            if (response.data.length > 0) {
+                            if (response.data.chapters.length > 0) {
                                 $('#chapters-container').empty(); // Clear existing content
+                                loadBookData(response.data);
 
-                                $('#chapters').val(JSON.stringify(response.data));
-
-                                // Loop through the chapters array and generate HTML
-                                $.each(response.data, function (index, chapter) {
-                                    var chapterId = 'chapter' + index;
-
-                                    var chapterHtml = `
-                                            <div class="card mb-3">
-                                                <div class="fw-bold px-3 py-2 border-bottom"
-                                                     data-bs-toggle="collapse"
-                                                     data-bs-target="#${chapterId}"
-                                                     aria-expanded="false"
-                                                     aria-controls="${chapterId}"
-                                                     role="button">
-                                                    ${chapter.title}
-                                                </div>
-                                                <div id="${chapterId}" class="collapse">
-                                                    <div class="p-3">
-                                                        ${chapter.content}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        `;
-
-                                    // Append generated HTML to the container
-                                    $('#chapters-container').append(chapterHtml);
-                                });
                             } else {
                                 $('#chapters-container').html('<p class="text-danger">No chapters available.</p>');
                             }
@@ -341,6 +323,113 @@
                     }
                 });
             });
+
+            // Function to load the content into the form
+            function loadBookData(data) {
+                // Set the title
+                $('#book-form').prepend(`
+                    <h2>${data.title}</h2>
+                    <p>${data.introduction.content}</p>
+                `);
+
+                // Loop through chapters and create them
+                data.chapters.forEach((chapter, index) => {
+                    const chapterHTML = createChapter(index, chapter);
+                    $('#chapters-container').append(chapterHTML);
+                });
+
+                // Set conclusion content
+                $('#book-form').append(`
+                        <p>${data.conclusion.content}</p>
+                    `);
+            }
+
+            // Function to create a chapter template
+            function createChapter(chapterIndex) {
+                return `
+                        <div class="chapter" data-chapter-index="${chapterIndex}">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xl font-medium">${chapterIndex + 1}.</span>
+                                <input type="text" name="chapters[${chapterIndex}].title" placeholder="Chapter Title" class="chapter-title">
+                                <button type="button" class="delete-chapter btn btn-danger">Delete Chapter</button>
+                            </div>
+
+                            <div class="sections-container" id="sections-${chapterIndex}">
+                                <!-- Sections will be appended here dynamically -->
+                            </div>
+
+                            <button type="button" class="add-section btn btn-secondary">Add Section</button>
+                        </div>`;
+            }
+
+            // Function to create a section template
+            function createSection(chapterIndex, sectionIndex) {
+                return `
+                        <div class="section" data-section-index="${sectionIndex}">
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium">${sectionIndex + 1}.</span>
+                                <input type="text" name="chapters[${chapterIndex}].sections[${sectionIndex}].title" placeholder="Section Title" class="section-title">
+                                <button type="button" class="delete-section btn btn-warning">Delete Section</button>
+                            </div>
+                        </div>`;
+            }
+
+            // Add a new chapter
+            $('#add-chapter').click(function () {
+                chapterCount++;
+                const chapterHTML = createChapter(chapterCount - 1);
+                $('#chapters-container').append(chapterHTML);
+            });
+
+            // Add a new section to a chapter
+            $(document).on('click', '.add-section', function () {
+                const chapterIndex = $(this).closest('.chapter').data('chapter-index');
+                const sectionCount = $(`#sections-${chapterIndex} .section`).length;
+                const sectionHTML = createSection(chapterIndex, sectionCount);
+                $(`#sections-${chapterIndex}`).append(sectionHTML);
+                reNumberSections(chapterIndex);  // Renumber sections after adding
+            });
+
+            // Delete a chapter and its sections
+            $(document).on('click', '.delete-chapter', function () {
+                const chapterIndex = $(this).closest('.chapter').data('chapter-index');
+                $(this).closest('.chapter').remove();
+                reNumberChapters();  // Renumber chapters after deletion
+            });
+
+            // Delete a section
+            $(document).on('click', '.delete-section', function () {
+                const chapterIndex = $(this).closest('.chapter').data('chapter-index');
+                const sectionIndex = $(this).closest('.section').data('section-index');
+                $(this).closest('.section').remove();
+                reNumberSections(chapterIndex);  // Renumber sections after deletion
+            });
+
+            // Insert a new section after the clicked section
+            $(document).on('click', '.add-section', function () {
+                const chapterIndex = $(this).closest('.chapter').data('chapter-index');
+                const sectionIndex = $(this).closest('.section').data('section-index');
+                // Create a new section after the clicked section
+                const newSectionHTML = createSection(chapterIndex, sectionIndex + 1);
+                $(`#sections-${chapterIndex}`).append(newSectionHTML);
+            });
+
+            // Function to renumber sections after add/delete
+            function reNumberSections(chapterIndex) {
+                $(`#sections-${chapterIndex} .section`).each(function (index) {
+                    $(this).find('span').text(index + 1 + '.');
+                    $(this).data('section-index', index); // Update section index
+                });
+            }
+
+            // Function to renumber chapters after add/delete
+            function reNumberChapters() {
+                $('#chapters-container .chapter').each(function (index) {
+                    $(this).find('span').text(index + 1 + '.');  // Renumber chapter numbers
+                    $(this).data('chapter-index', index);  // Update chapter index
+                });
+            }
+
         });
     </script>
 @endpush
