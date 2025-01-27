@@ -157,16 +157,11 @@
 
                             <div id="step3" class="d-none">
 
-                                <h6 class="mt-3">Book Details:</h6>
-
-                                <button type="button" id="add-chapter" class="btn btn-primary">Add Chapter</button>
-
-                                <div id="chapters-container">
-                                    <!-- Chapters will be appended here dynamically -->
-                                </div>
+                                <div class="h3 mb-3" id="book-title"></div>
+                                <div id="chapters-container"></div>
 
                                 <button type="submit" id="save_details"
-                                        class="i-btn btn--primary btn--sm  step-btn">{{ translate("Generate Book Using AI Magic") }}</button>
+                                        class="i-btn btn--primary btn--sm mt-3 step-btn">{{ translate("Generate Book Using AI Magic") }}</button>
                             </div>
                         </div>
                     </div>
@@ -267,6 +262,8 @@
                                 .addClass('btn--primary');
                             if (response.data.chapters.length > 0) {
                                 $('#chapters-container').empty(); // Clear existing content
+                                $('#book-title').empty(); // Clear existing content
+                                $('#book-title').append(response.data.title); // Clear existing content
                                 loadBookData(response.data);
 
                             } else {
@@ -326,109 +323,161 @@
 
             // Function to load the content into the form
             function loadBookData(data) {
-                // Set the title
-                $('#book-form').prepend(`
-                    <h2>${data.title}</h2>
-                    <p>${data.introduction.content}</p>
-                `);
+                // Set the title and add select-all checkbox at the start of the chapters container
+                $('#chapters-container').prepend(`
+        <div class="d-flex justify-content-end align-items-center gap-2 mb-3 right">
+            <input type="checkbox" id="select-all-images" checked>
+            <label for="select-all-images" class="mb-0">{{ translate("Add images to all chapters") }}</label>
+        </div>
+    `);
 
                 // Loop through chapters and create them
                 data.chapters.forEach((chapter, index) => {
-                    const chapterHTML = createChapter(index, chapter);
+                    const chapterHTML = createChapter(index);
                     $('#chapters-container').append(chapterHTML);
+
+                    // Ensure at least one section exists in each chapter
+                    if (chapter.sections && chapter.sections.length > 0) {
+                        chapter.sections.forEach((section, sectionIndex) => {
+                            const sectionHTML = createSection(index, sectionIndex);
+                            $(`#sections-${index}`).append(sectionHTML);
+                        });
+                    } else {
+                        const sectionHTML = createSection(index, 0);
+                        $(`#sections-${index}`).append(sectionHTML);
+                    }
+
+                    // Set the chapter image checkbox to be checked by default
+                    $(`input[name="chapters[${index}].hasImage"]`).prop('checked', true);
                 });
 
-                // Set conclusion content
-                $('#book-form').append(`
-                        <p>${data.conclusion.content}</p>
-                    `);
+                // Renumber all chapters and sections
+                reNumberChapters();
             }
 
-            // Function to create a chapter template
+// Function to create a chapter template
             function createChapter(chapterIndex) {
                 return `
-                        <div class="chapter" data-chapter-index="${chapterIndex}">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xl font-medium">${chapterIndex + 1}.</span>
-                                <input type="text" name="chapters[${chapterIndex}].title" placeholder="Chapter Title" class="chapter-title">
-                                <button type="button" class="delete-chapter btn btn-danger">Delete Chapter</button>
-                            </div>
+        <div class="chapter mb-3" data-chapter-index="${chapterIndex}">
+            <div class="d-flex align-items-center gap-2">
+                <span class="chapter-number">${chapterIndex + 1}.</span>
+                <input type="text"
+                       name="chapters[${chapterIndex}].title"
+                       placeholder="Chapter Title"
+                       class="form-control border-0 flex-grow-1">
 
-                            <div class="sections-container" id="sections-${chapterIndex}">
-                                <!-- Sections will be appended here dynamically -->
-                            </div>
-
-                            <button type="button" class="add-section btn btn-secondary">Add Section</button>
-                        </div>`;
+                <a href="#" class="delete-chapter btn-sm btn btn-outline-danger">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+                <a href="#" class="add-chapter btn-sm btn btn-outline-success">
+                    <i class="bi bi-plus-lg"></i>
+                </a>
+                <label class="d-flex align-items-center gap-1 mb-0">
+                    <input type="checkbox" name="chapters[${chapterIndex}].hasImage" class="chapter-has-image" checked>
+                    <span>Image</span>
+                </label>
+            </div>
+            <div class="sections-container mt-2 ms-4" id="sections-${chapterIndex}">
+                ${createSection(chapterIndex, 0)} <!-- Add a default section -->
+            </div>
+        </div>`;
             }
 
-            // Function to create a section template
+// Function to create a section template
             function createSection(chapterIndex, sectionIndex) {
                 return `
-                        <div class="section" data-section-index="${sectionIndex}">
-                            <div class="flex items-center justify-between">
-                                <span class="font-medium">${sectionIndex + 1}.</span>
-                                <input type="text" name="chapters[${chapterIndex}].sections[${sectionIndex}].title" placeholder="Section Title" class="section-title">
-                                <button type="button" class="delete-section btn btn-warning">Delete Section</button>
-                            </div>
-                        </div>`;
+        <div class="section mb-2 d-flex align-items-center gap-2 section-hover" data-section-index="${sectionIndex}">
+            <span class="section-number">${sectionIndex + 1}.</span>
+            <input type="text"
+                   name="chapters[${chapterIndex}].sections[${sectionIndex}].title"
+                   placeholder="Section Title"
+                   class="form-control border-0 flex-grow-1">
+            <a href="#" class="delete-section btn-sm btn btn-outline-warning d-none">
+                <i class="bi bi-x-lg"></i>
+            </a>
+            <a href="#" class="add-section btn-sm btn btn-outline-success d-none">
+                <i class="bi bi-plus-lg"></i>
+            </a>
+        </div>`;
             }
 
-            // Add a new chapter
-            $('#add-chapter').click(function () {
-                chapterCount++;
-                const chapterHTML = createChapter(chapterCount - 1);
-                $('#chapters-container').append(chapterHTML);
+// Event listener for the "Select All" checkbox
+            $(document).on('change', '#select-all-images', function () {
+                const isChecked = $(this).is(':checked');
+                $('.chapter-has-image').prop('checked', isChecked); // Check/uncheck all chapter checkboxes
             });
 
-            // Add a new section to a chapter
-            $(document).on('click', '.add-section', function () {
+// Event listener to update the "Select All" checkbox based on individual checkboxes
+            $(document).on('change', '.chapter-has-image', function () {
+                const allChecked = $('.chapter-has-image').length === $('.chapter-has-image:checked').length;
+                $('#select-all-images').prop('checked', allChecked); // Update the "Select All" checkbox state
+            });
+
+// Event listeners for adding/deleting sections
+            $(document).on('click', '.add-section', function (e) {
+                e.preventDefault();
+                const chapterIndex = $(this).closest('.chapter').data('chapter-index');
+                const section = $(this).closest('.section');
+                const sectionIndex = section.data('section-index') + 1;
+
+                const sectionHTML = createSection(chapterIndex, sectionIndex);
+                section.after(sectionHTML);
+                reNumberSections(chapterIndex);
+            });
+
+            $(document).on('click', '.delete-section', function (e) {
+                e.preventDefault();
                 const chapterIndex = $(this).closest('.chapter').data('chapter-index');
                 const sectionCount = $(`#sections-${chapterIndex} .section`).length;
-                const sectionHTML = createSection(chapterIndex, sectionCount);
-                $(`#sections-${chapterIndex}`).append(sectionHTML);
-                reNumberSections(chapterIndex);  // Renumber sections after adding
+
+                // Only allow deletion if there's more than one section
+                if (sectionCount > 1) {
+                    $(this).closest('.section').remove();
+                    reNumberSections(chapterIndex);
+                } else {
+                    alert('Each chapter must have at least one section.');
+                }
             });
 
-            // Delete a chapter and its sections
-            $(document).on('click', '.delete-chapter', function () {
-                const chapterIndex = $(this).closest('.chapter').data('chapter-index');
+// Event listeners for adding/deleting chapters
+            $(document).on('click', '.add-chapter', function (e) {
+                e.preventDefault();
+                const currentChapter = $(this).closest('.chapter');
+                const chapterIndex = currentChapter.data('chapter-index') + 1;
+
+                const chapterHTML = createChapter(chapterIndex);
+                currentChapter.after(chapterHTML);
+                reNumberChapters();
+            });
+
+            $(document).on('click', '.delete-chapter', function (e) {
+                e.preventDefault();
                 $(this).closest('.chapter').remove();
-                reNumberChapters();  // Renumber chapters after deletion
+                reNumberChapters();
             });
 
-            // Delete a section
-            $(document).on('click', '.delete-section', function () {
-                const chapterIndex = $(this).closest('.chapter').data('chapter-index');
-                const sectionIndex = $(this).closest('.section').data('section-index');
-                $(this).closest('.section').remove();
-                reNumberSections(chapterIndex);  // Renumber sections after deletion
-            });
-
-            // Insert a new section after the clicked section
-            $(document).on('click', '.add-section', function () {
-                const chapterIndex = $(this).closest('.chapter').data('chapter-index');
-                const sectionIndex = $(this).closest('.section').data('section-index');
-                // Create a new section after the clicked section
-                const newSectionHTML = createSection(chapterIndex, sectionIndex + 1);
-                $(`#sections-${chapterIndex}`).append(newSectionHTML);
-            });
-
-            // Function to renumber sections after add/delete
+// Function to renumber sections within a chapter
             function reNumberSections(chapterIndex) {
                 $(`#sections-${chapterIndex} .section`).each(function (index) {
-                    $(this).find('span').text(index + 1 + '.');
+                    $(this).find('.section-number').text(`${index + 1}.`);
                     $(this).data('section-index', index); // Update section index
+                    $(this).find('input').attr('name', `chapters[${chapterIndex}].sections[${index}].title`);
                 });
             }
 
-            // Function to renumber chapters after add/delete
+// Function to renumber chapters and ensure correct numbering for sections
             function reNumberChapters() {
                 $('#chapters-container .chapter').each(function (index) {
-                    $(this).find('span').text(index + 1 + '.');  // Renumber chapter numbers
-                    $(this).data('chapter-index', index);  // Update chapter index
+                    $(this).find('.chapter-number').text(`${index + 1}.`);
+                    $(this).data('chapter-index', index);
+                    $(this).find('input[name^="chapters"]').attr('name', function (_, attr) {
+                        return attr.replace(/\chapters\[\d+\]/, `chapters[${index}]`);
+                    });
+                    $(this).find('.sections-container').attr('id', `sections-${index}`);
+                    reNumberSections(index); // Renumber sections in this chapter
                 });
             }
+
 
         });
     </script>

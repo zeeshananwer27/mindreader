@@ -1,6 +1,20 @@
 .cursor-pointer {
     cursor: pointer !important;
 }
+
+.chapter .delete-chapter, .chapter .add-chapter, .section .delete-section, .section .add-section {
+    display: none;
+}
+
+.chapter:hover .delete-chapter, .chapter:hover .add-chapter,
+.section:hover .delete-section, .section:hover .add-section {
+    display: inline-block !important; /* Display buttons on hover */
+}
+
+.section-number {
+    margin-right: 8px;
+}
+
 .swal-custom {
     display: flex;
     flex-direction: column;
