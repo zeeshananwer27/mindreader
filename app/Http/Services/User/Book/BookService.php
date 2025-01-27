@@ -4,6 +4,7 @@ namespace App\Http\Services\User\Book;
 
 use App\Http\Requests\User\Book\BookRequest;
 use App\Http\Services\AiService;
+use App\Jobs\GenerateChapterDetailsJob;
 use App\Models\AiTemplate;
 use App\Models\AuthorProfile;
 use App\Models\Book;
@@ -17,6 +18,29 @@ class BookService
     public function __construct(AiService $aiService)
     {
         $this->aiService = $aiService;
+    }
+
+    public function createBook(BookRequest $request): Book
+    {
+        $book = $this->saveBookChapterToDb($request);
+        // here write the functionality to run job class
+        GenerateChapterDetailsJob::dispatch($book)->onQueue('default');
+
+        return $book;
+    }
+
+    public function getChapterDetailsByAi($inputData): array
+    {
+        //get template to generate author string from default template created by AiTemplate seeder
+        $authorTemplate = AiTemplate::query()->where('uid', '61d3379c-abc1-4be6-90f1-9998ec2d6110')->first();
+        try {
+            return $this->aiService->generateAiContent($inputData, $authorTemplate);
+        } catch (Exception $e) {
+            return [
+                "status" => false,
+                "message" => $e->getMessage(),
+            ];
+        }
     }
 
     public function getAuthorDetailsByAi($inputData): array
@@ -173,7 +197,7 @@ class BookService
         }
     }
 
-    function parseTextToJson($response): array
+    private function parseTextToJson($response): array
     {
         $lines = explode("\n", $response);
         $jsonData = ["title" => "", "introduction" => ["content" => ""], "chapters" => [], "conclusion" => ["content" => ""]];
@@ -225,15 +249,6 @@ class BookService
         return $jsonData;
     }
 
-    public function createBook(BookRequest $request): Book
-    {
-        $book = $this->saveBookChapterToDb($request);
-
-        // here write the functionality to run job class
-
-        return $book;
-    }
-
     private function saveBookChapterToDb($request): Book
     {
         $book = new Book();
@@ -246,7 +261,7 @@ class BookService
         $book->target_audience = $request->get('target_audience') ?? null;
         $book->length = $request->get('length') ?? null;
         $book->language = $request->get('language') ?? null;
-        $book->synopsis = $request->get('synopsis') ?? null;
+        $book->synopsis = $request->get('book_synopsis') ?? null;
         $book->save();
 
         $chaptersArray = $request->chapters;

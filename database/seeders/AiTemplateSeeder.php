@@ -167,6 +167,65 @@ class AiTemplateSeeder extends Seeder
                 'status' => "1",
                 'is_default' => "0"
             ],
+            // Create chapters details Template to generate string query to OpenAI
+            [
+                'uid' => '61d2279c-abc1-4be6-90f1-9448ec2d6f55',
+                'category_id' => 1,
+                'sub_category_id' => null,
+                'user_id' => null,
+                'admin_id' => null,
+                'name' => 'Create chapters details',
+                'slug' => 'create-chapter-details',
+                'icon' => 'bi bi-app-indicator',
+                'description' => 'book chapter details',
+                'prompt_fields' => json_encode([
+                    'author' => [
+                        'instraction' => 'author',
+                        'field_name' => 'author',
+                        'field_label' => 'author',
+                        'type' => 'text',
+                        'validation' => 'required',
+                    ],
+                    'chapter_name' => [
+                        'instraction' => 'chapter_name',
+                        'field_name' => 'chapter_name',
+                        'field_label' => 'Chapter Name',
+                        'type' => 'text',
+                        'validation' => 'required',
+                    ],
+                    'synopsis' => [
+                        'instraction' => 'synopsis',
+                        'field_name' => 'synopsis',
+                        'field_label' => 'synopsis',
+                        'type' => 'text',
+                        'validation' => 'required',
+                    ],
+                    'title' => [
+                        'instraction' => 'title',
+                        'field_name' => 'title',
+                        'field_label' => 'title',
+                        'type' => 'text',
+                        'validation' => 'required',
+                    ],
+                    'topics' => [
+                        'instraction' => 'topics',
+                        'field_name' => 'topics',
+                        'field_label' => 'topics',
+                        'type' => 'text',
+                        'validation' => 'required',
+                    ],
+                ]),
+                'custom_prompt' => 'write detail paragraphs for book with following details:-
+                chapter name is: "{chapter}"
+                topics are: "{topics}"
+                name of book is: "{title}"
+                Synopsis of book is: "{synopsis}"
+                author details of book is:"{author}"
+                note: do not write book synopsis and author details. do not write "topic" keyword with topic title',
+                'total_words' => 0,
+                'status' => "1",
+                'is_default' => "0"
+            ],
             [
                 'uid' => '293a8bec-39f2-418a-99bf-d0f18ffeab2b',
                 'category_id' => 1,

@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\User;
-// namespace App\Http\Requests;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\Book\BookRequest;
@@ -20,7 +19,6 @@ use Smalot\PdfParser\Parser;
 class BookController extends Controller
 {
     protected $user, $subscription, $remainingBooks;
-
     private BookService $bookService;
 
     public function __construct(BookService $bookService)
@@ -34,7 +32,6 @@ class BookController extends Controller
         });
         $this->bookService = $bookService;
     }
-
 
     public function dashboard()
     {
@@ -70,22 +67,6 @@ class BookController extends Controller
     }
 
     /**
-     * Store a new book
-     *
-     * @param BookRequest $request
-     * @return JsonResponse
-     */
-    public function store(BookRequest $request): JsonResponse
-    {
-        $response = $this->bookService->createBook($request);
-        return response()->json([
-            'status' => true,
-            'message' => translate("Book is on his way. Please wait for a moment. Notify you when book is ready."),
-            'data' => $response
-        ]);
-    }
-
-    /**
      * Create a new book
      *
      * @return View
@@ -104,11 +85,91 @@ class BookController extends Controller
             'genres' => $genres,
             'book_languages' => $languages,
         ]);
-
     }
 
     /**
-     * Create a new book
+     * Store a new book
+     *
+     * @param BookRequest $request
+     * @return JsonResponse
+     */
+    public function store(BookRequest $request): JsonResponse
+    {
+        $response = $this->bookService->createBook($request);
+        return response()->json([
+            'status' => true,
+            'message' => translate("Book is on his way. Please wait for a moment. Notify you when book is ready."),
+            'data' => $response
+        ]);
+    }
+
+
+    /**
+     * Show book details
+     *
+     * @param string $id
+     * @return View
+     */
+    public function show(string $id): View
+    {
+        $book = Book::with(['chapters', 'authorProfile'])
+            ->where('id', $id)
+            ->where('user_id', $this->user->id)
+            ->firstOrFail();
+        return view('user.books.show', [
+            'meta_data' => $this->metaData(['title' => translate('Book Details')]),
+            'book' => $book,
+        ]);
+    }
+
+    /**
+     * Edit a book
+     *
+     * @param string $id
+     * @return View
+     */
+    public function edit(string $id): View
+    {
+        $book = Book::where('id', $id)->where('user_id', $this->user->id)->firstOrFail();
+        $profiles = AuthorProfile::where('user_id', $this->user->id)->get();
+
+        return view('user.book.edit', [
+            'meta_data' => $this->metaData(['title' => translate('Edit Book')]),
+            'book' => $book,
+            'profiles' => $profiles,
+        ]);
+    }
+
+    /**
+     * Update book details
+     *
+     * @param BookRequest $request
+     * @return RedirectResponse
+     */
+    public function update(BookRequest $request): RedirectResponse
+    {
+        $book = Book::where('id', $request->id)->where('user_id', $this->user->id)->firstOrFail();
+        $book->update($request->all());
+
+        return redirect()->route('book.manager.list')->with('success', translate('Book updated successfully.'));
+    }
+
+    /**
+     * Delete a book
+     *
+     * @param string $id
+     * @return RedirectResponse
+     */
+    public function destroy(string $id): RedirectResponse
+    {
+        $book = Book::where('id', $id)->where('user_id', $this->user->id)->firstOrFail();
+        $book->delete();
+
+        return back()->with('success', translate('Book deleted successfully.'));
+    }
+
+    /**
+     * Recreate External book
      *
      * @return View
      */
@@ -206,70 +267,6 @@ class BookController extends Controller
     public function checkRemainingBooks(): bool
     {
         return ($this->remainingBooks === -1 || $this->remainingBooks > 0);
-    }
-
-    /**
-     * Show book details
-     *
-     * @param string $id
-     * @return View
-     */
-    public function show(string $id): View
-    {
-        $book = Book::with(['chapters', 'authorProfile'])
-            ->where('id', $id)
-            ->where('user_id', $this->user->id)
-            ->firstOrFail();
-        return view('user.books.show', [
-            'meta_data' => $this->metaData(['title' => translate('Book Details')]),
-            'book' => $book,
-        ]);
-    }
-
-    /**
-     * Edit a book
-     *
-     * @param string $id
-     * @return View
-     */
-    public function edit(string $id): View
-    {
-        $book = Book::where('id', $id)->where('user_id', $this->user->id)->firstOrFail();
-        $profiles = AuthorProfile::where('user_id', $this->user->id)->get();
-
-        return view('user.book.edit', [
-            'meta_data' => $this->metaData(['title' => translate('Edit Book')]),
-            'book' => $book,
-            'profiles' => $profiles,
-        ]);
-    }
-
-    /**
-     * Update book details
-     *
-     * @param BookRequest $request
-     * @return RedirectResponse
-     */
-    public function update(BookRequest $request): RedirectResponse
-    {
-        $book = Book::where('id', $request->id)->where('user_id', $this->user->id)->firstOrFail();
-        $book->update($request->all());
-
-        return redirect()->route('book.manager.list')->with('success', translate('Book updated successfully.'));
-    }
-
-    /**
-     * Delete a book
-     *
-     * @param string $id
-     * @return RedirectResponse
-     */
-    public function destroy(string $id): RedirectResponse
-    {
-        $book = Book::where('id', $id)->where('user_id', $this->user->id)->firstOrFail();
-        $book->delete();
-
-        return back()->with('success', translate('Book deleted successfully.'));
     }
 
     /**
