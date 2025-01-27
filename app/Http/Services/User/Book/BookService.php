@@ -2,9 +2,12 @@
 
 namespace App\Http\Services\User\Book;
 
+use App\Http\Requests\User\Book\BookRequest;
 use App\Http\Services\AiService;
 use App\Models\AiTemplate;
 use App\Models\AuthorProfile;
+use App\Models\Book;
+use App\Models\Chapter;
 use Exception;
 
 class BookService
@@ -170,7 +173,7 @@ class BookService
         }
     }
 
-    function parseTextToJson($response)
+    function parseTextToJson($response): array
     {
         $lines = explode("\n", $response);
         $jsonData = ["title" => "", "introduction" => ["content" => ""], "chapters" => [], "conclusion" => ["content" => ""]];
@@ -222,4 +225,47 @@ class BookService
         return $jsonData;
     }
 
+    public function createBook(BookRequest $request): Book
+    {
+        $book = $this->saveBookChapterToDb($request);
+
+        // here write the functionality to run job class
+
+        return $book;
+    }
+
+    private function saveBookChapterToDb($request): Book
+    {
+        $book = new Book();
+        $book->user_id = auth()->id();
+        $book->author_profile_id = $request->get('author_profile_id') ?? null;
+        $book->about_author = $request->get('about_author') ?? null;
+        $book->genre = $request->get('genre') ?? null;
+        $book->title = $request->get('title') ?? null;
+        $book->purpose = $request->get('purpose') ?? null;
+        $book->target_audience = $request->get('target_audience') ?? null;
+        $book->length = $request->get('length') ?? null;
+        $book->language = $request->get('language') ?? null;
+        $book->synopsis = $request->get('synopsis') ?? null;
+        $book->save();
+
+        $chaptersArray = $request->chapters;
+        // Use Eloquent relationships to create chapters in bulk
+        $chapters = collect($chaptersArray)->map(function ($chapter) use ($book) {
+            return [
+                'uid' => uniqid(),
+                'title' => $chapter['title'],
+                'content' => json_encode($chapter['sections']),
+                'book_id' => $book->id,
+                'has_image' => $chapter['has_image'] ?? false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        });
+
+        // Insert all chapters at once
+        Chapter::insert($chapters->toArray());
+
+        return $book->load('chapters');
+    }
 }

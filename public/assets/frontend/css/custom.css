@@ -2,6 +2,12 @@
     cursor: pointer !important;
 }
 
+.chapters-container input.form-check-input {
+    margin-top: 0 !important;
+    height: 1rem !important;
+    width: 1rem !important;
+}
+
 .chapter .delete-chapter, .chapter .add-chapter, .section .delete-section, .section .add-section {
     display: none;
 }
@@ -41,16 +47,30 @@
 }
 
 @keyframes dotAnimation {
-    0% { content: ""; }
-    25% { content: "."; }
-    50% { content: ".."; }
-    75% { content: "..."; }
-    100% { content: ""; }
+    0% {
+        content: "";
+    }
+    25% {
+        content: ".";
+    }
+    50% {
+        content: "..";
+    }
+    75% {
+        content: "...";
+    }
+    100% {
+        content: "";
+    }
 }
 
 @keyframes lightGlow {
-    0%, 100% { text-shadow: 0 0 10px rgba(255, 255, 255, 0.8); }
-    50% { text-shadow: 0 0 20px rgba(255, 255, 255, 1); }
+    0%, 100% {
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    }
+    50% {
+        text-shadow: 0 0 20px rgba(255, 255, 255, 1);
+    }
 }
 
 .rounded-circle-text {
@@ -98,6 +118,7 @@
     font-size: 14px;
     padding: 5px 15px;
 }
+
 .step-item {
     flex: 1;
     position: relative;
@@ -111,7 +132,7 @@
     width: 5rem;
     height: 2px;
     background: #ccc;
-    margin: 0 auto;  /* Center the step lines */
+    margin: 0 auto; /* Center the step lines */
 }
 
 .step-btn {
@@ -151,11 +172,13 @@
     max-width: 1200px; /* Prevent stretching on larger screens */
     padding: 20px;
 }
+
 @media (min-width: 1199px) {
-    .steps-wrapper{
+    .steps-wrapper {
         margin-left: 114px;
     }
 }
+
 /* Responsive Fixes */
 @media (max-width: 992px) {
     .steps-container {

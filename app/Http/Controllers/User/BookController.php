@@ -10,7 +10,6 @@ use App\Http\Services\User\Book\BookService;
 use App\Models\AuthorProfile;
 use App\Models\Book;
 use App\Models\BookMedia;
-use App\Models\Chapter;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -78,42 +77,11 @@ class BookController extends Controller
      */
     public function store(BookRequest $request): JsonResponse
     {
-        // Convert JSON string to PHP array
-        $chaptersArray = json_decode($request->chapters, true);
-        $book = new Book();
-        $book->user_id = auth()->id();
-        $book->author_profile_id = $request->author_profile_id;
-        $book->about_author = $request->aboutauther;
-        $book->genre = $request->genre_id;
-        $book->title = $request->title;
-        $book->purpose = $request->purpose;
-        $book->target_audience = $request->target_audience;
-        $book->length = $request->length;
-        $book->language = $request->language;
-        $book->synopsis = $request->booksynopsis;
-        $book->save();
-
-        // Use Eloquent relationships to create chapters in bulk
-        $chapters = collect($chaptersArray)->map(function ($chapter) use ($book) {
-            return [
-                'uid' => uniqid(),
-                'title' => $chapter['title'],
-                'content' => $chapter['content'],
-                'book_id' => $book->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        });
-
-        // Insert all chapters at once
-        Chapter::insert($chapters->toArray());
-
-        $bookWithChapters = $book->load('chapters');
-
+        $response = $this->bookService->createBook($request);
         return response()->json([
             'status' => true,
-            'message' => 'Book and chapters saved successfully',
-            'data' => $bookWithChapters,
+            'message' => translate("Book is on his way. Please wait for a moment. Notify you when book is ready."),
+            'data' => $response
         ]);
     }
 
@@ -178,7 +146,7 @@ class BookController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Book recreated successfully',
+            'message' => translate("Book recreated successfully"),
             'data' => $book,
         ]);
     }
@@ -225,7 +193,7 @@ class BookController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Book recreated successfully',
+            'message' => translate("Book recreated successfully"),
             'data' => $book,
         ]);
     }
