@@ -26,12 +26,12 @@ class FrontendController extends Controller
      * @return View
      */
     public function home() :View{
-        // echo  env('CURRENT_ACTIVE_THEMES'); exit(' iiii'); 
+        // echo  env('CURRENT_ACTIVE_THEME'); exit(' iiii'); 
         $menu         = Menu::default()->first();
 
 
-        // if(env('CURRENT_ACTIVE_THEME')=='theme1'){
-         if(env('CURRENT_ACTIVE_THEME')== ''){   
+        if(env('CURRENT_ACTIVE_THEME')=='theme1'){
+         // if(env('CURRENT_ACTIVE_THEME')== ''){   
             return view('frontend.home_theme1',[
                 'meta_data' => $this->metaData([
                                     "title"               =>  $menu->meta_title,

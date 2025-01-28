@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('layouts.theme1')
 @section('content')
 
 @php
@@ -8,161 +8,81 @@
 
 @endphp
 
+      <!-- CONTACTS
+      ============================================= -->
+      <section class="pb-40 inner-page-hero contacts-1 contacts-section division">        
+        <div class="container">
 
-@include("frontend.partials.breadcrumb")
 
+          <!-- SECTION TITLE -->  
+          <div class="row justify-content-center">  
+            <div class="col-md-9 col-xl-8">
+              <div class="section-title text-center mb-80">
 
-<section class="contact pb-110">
-  <div class="container">
-    <div class="existing-customer linear-bg">
-          <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                <div>
-                    <h5> {{@$contact_section->value->support_title}}</h5>
-                      <p>
-                          {{@$contact_section->value->support_description}}
-                      </p>
-                </div>
-                <a href="{{url(@$contact_section->value->button_url)}}"
-                  class="i-btn btn--white btn--lg capsuled">
-                    {{@$contact_section->value->button_name}}
-                </a>
-          </div>
-    </div>
+                <!-- Title -->    
+                <h2 class="h2-title">Questions? Let's Talk</h2>
 
-    <div class="contact-wrapper linear-bg">
-          <div class="row g-5">
-            <div class="col-lg-6">
-              <div class="contact-left gs_reveal fromLeft">
-                    <div class="contact-left-img">
-                          <img src="{{imageURL($file,'frontend',true,$size)}}" alt="{{@$file->name??'contact.jpg'}}">
-                    </div>
-                <div class="section-title light mb-5">
-                     <h3 class="mt-0 mb-3">{{@$contact_section->value->section_heading}}</h3>
-                    <p>
-                          {{@$contact_section->value->section_description}}
-                    </p>
-                </div>
-                <ul class="contact-list">
-                    <li>
-                      <span><i class="bi bi-envelope-open"></i></span>
-                        <div>
-                            <a href="mailto:{{site_settings('email')}}">
-                                {{site_settings("email")}}
-                            </a>
-                        </div>
-                    </li>
-                    <li>
-                      <span><i class="bi bi-telephone"></i></span>
-                          <div>
-                            <a href="tel:{{site_settings('phone')}}"> {{site_settings("phone")}}</a>
-                          </div>
-                    </li>
-                    <li>
-                        <span><i class="bi bi-geo-alt"></i></span>
-                        <div>
-                          <p class="text-dark fw-medium"> {{site_settings("address")}}</p>
-                        </div>
-                    </li>
-                    <li>
-                         <span><i class="bi bi-clock"></i></span>
-                        <div>
-                            <p class="text-dark fw-medium"> {{@$contact_section->value->opening_hour_text}} </p>
-                        </div>
-                    </li>
-                </ul>
-              </div>
-            </div>
-            <div class="col-lg-6">
-              <div class="contact-form-wrapper">
-                <form action="{{route('contact.store')}}" class="contact-form gs_reveal fromRight" method="post">
-                      @csrf
-                      <h4>  {{$contact_section->value->section_title}}</h4>
-                      <div class="row gx-4 gy-5 mt-3">
-                        <div class="col-xl-6">
-                          <div class="form__group field">
-                            <input
-                              required
-                              placeholder="{{translate('Name')}}"
-                              class="form__field"
-                              name="name"
-                              value="{{old('name')}}"
-                              type="text"
-                              id="name"/>
-                            <label class="form__label" for="name">
-                                {{translate("Name")}}
-                            </label>
-                          </div>
-                        </div>
-                        <div class="col-xl-6">
-                          <div class="form__group field">
-                            <input
-                              required
-                              placeholder="{{translate('Phone')}}"
-                              id="number"
-                              class="form__field"
-                              type="text"
-                              name="phone"
-                              value="{{old('phone')}}"/>
-                            <label class="form__label" for="number">
-                                {{translate("Phone")}}
-                            </label>
-                          </div>
-                        </div>
-                        <div class="col-12">
-                          <div class="form__group field">
-                            <input
-                              required
-                              placeholder="{{translate('Email')}}"
-                              class="form__field"
-                              type="email"
-                              name="email"
-                              value="{{old('email')}}"
-                              id="email"/>
-                            <label class="form__label" for="email">
-                                {{translate('Email')}}
-                            </label>
-                          </div>
-                        </div>
-                        <div class="col-12">
-                          <div class="form__group field">
-                            <input
-                              required
-                              placeholder="{{translate('Subject')}}"
-                              name="subject"
-                              class="form__field"
-                              value="{{old('subject')}}"
-                              type="text"
-                              id="subject"
-                            />
-                            <label class="form__label" for="subject">
-                              {{translate("Subject")}}
-                            </label>
-                          </div>
-                        </div>
-                        <div class="col-12">
-                          <div class="form__group field">
-                            <textarea placeholder="{{translate('Message')}}" required  class="form__field" id="message" name="message">{{old('message')}}</textarea>
-                              <label class="form__label" for="message">
-                                {{translate("Write your Message")}}
-                              </label>
-                          </div>
-                        </div>
-                        <div class="col-12">
-                          <button  class="i-btn btn--primary btn--lg capsuled">
-                                {{translate("Send Message")}}
-                          </button>
-                        </div>
-                      </div>
-                </form>
-              </div>
+                <!-- Text -->     
+                <p class="p-lg">Want to learn more about Pintex, get a quote, or speak with an expert? 
+                  Let us know what you are looking for and we’ll get back to you right away
+                </p>
+              </div>  
             </div>
           </div>
-    </div>
-  </div>
-</section>
 
 
-@include('frontend.partials.page_section')
+          <!-- CONTACT FORM -->
+          <div class="row justify-content-center">  
+            <div class="col-md-11 col-lg-9 col-xl-8">
+              <div class="form-holder">
+                <form action = "{{route('contact.store')}}" name="contactform" class="row contact-form" method="post">
+                  @csrf
+                  <!-- Form Select -->
+                                            
+                  <!-- Contact Form Input -->
+                  <div class="col-md-12">
+                    <p>{{translate("Name")}}: </p>
+                    <input type="text" name="name" value = "{{old('name')}}" class="form-control name" placeholder="{{translate('Name')}}"> 
+                  </div>
+                  
+                  <div class="col-md-12">
+                    <p>{{translate("Phone")}}: </p>
+                    <input type="text" name="phone" value = "{{old('phone')}}" class="form-control name" placeholder="{{translate('Phone')}}"> 
+                  </div>
+
+                  <div  class="col-md-12">
+                    <p>Your Email Address: </p>
+                    <input type="email" name="email" value = "{{old('email')}}" class="form-control email" placeholder="{{translate('Email')}}"> 
+                  </div>
+                  
+                  <div  class="col-md-12">
+                    <p>{{translate("Subject")}}: </p>
+                    <input type="text" name="subject" value = "{{old('subject')}}" class="form-control email" placeholder="{{translate('Subject')}}"> 
+                  </div>
+
+                  <div class="col-md-12">
+                    <p>Explain your question in details: </p>
+                    <textarea class="form-control message" name="message" rows="6" placeholder="{{translate('Message')}}"> {{old('message')}} </textarea>
+                  </div> 
+                                            
+                  <!-- Contact Form Button -->
+                  <div class="col-md-12 mt-15 form-btn text-right"> 
+                    <button type="submit" class="btn r-36 btn--theme hover--black submit">{{translate("Send Message")}}</button> 
+                  </div>
+                                                              
+                  <!-- Contact Form Message -->
+                  <div class="col-lg-12 contact-form-msg">
+                    <span class="loading"></span>
+                  </div>  
+                                              
+                </form> 
+              </div>  
+            </div>  
+          </div>     <!-- END CONTACT FORM -->
+
+
+        </div>     <!-- End container --> 
+      </section>  <!-- END CONTACTS -->
 
 @endsection
 

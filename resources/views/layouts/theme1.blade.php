@@ -132,23 +132,23 @@
     <ul class="wsmenu-list nav-theme">
 
         <!-- DROPDOWN SUB MENU -->
-        <li aria-haspopup="true">
+        <!-- <li aria-haspopup="true">
             <a href="#" class="h-link">About <span class="wsarrow"></span></a>
             <ul class="sub-menu ico-10">
                 <li aria-haspopup="true" class="h-link"><a href="#benefits">Why Pintex?</a></li>
                 <li aria-haspopup="true" class="h-link"><a href="#how-it-works">How It Works</a></li>
                 <li aria-haspopup="true" class="h-link"><a href="#">Release Notes</a></li>
             </ul>
+        </li> -->
+
+        <!-- SIMPLE NAVIGATION LINK -->
+        <li class="nl-simple" aria-haspopup="true">
+            <a href="{{ route('contact')}}" class="h-link">Contact us</a>
         </li>
 
         <!-- SIMPLE NAVIGATION LINK -->
         <li class="nl-simple" aria-haspopup="true">
-            <a href="#features" class="h-link">Features</a>
-        </li>
-
-        <!-- SIMPLE NAVIGATION LINK -->
-        <li class="nl-simple" aria-haspopup="true">
-            <a href="#" class="h-link">Pricing</a>
+            <a href="{{ route('plan') }}" class="h-link">Plans</a>
         </li>
 
         <!-- DROPDOWN SUB MENU -->
@@ -159,6 +159,10 @@
                 <li aria-haspopup="true" class="h-link"><a href="#">More Products</a></li>
                 <li aria-haspopup="true" class="h-link"><a href="#">Pintex Blog</a></li>
             </ul>
+        </li>
+
+        <li class="nl-simple" aria-haspopup="true">
+            <a href="{{ route('blog') }}" class="h-link">Blogs</a>
         </li>
 
         <!-- SIMPLE NAVIGATION LINK -->
@@ -196,6 +200,8 @@
 
 			<!-- HERO
 			============================================= -->	
+			@yield('content')
+
 			<section id="hero-9" class="bg--fixed hero-section division">
 				<div class="container">	
 					<div class="row d-flex align-items-center">
@@ -254,7 +260,9 @@
 
 					</div>    <!-- End row --> 	
 				</div>	   <!-- End container --> 
-			</section>	<!-- END HERO -->
+			</section>	
+
+			<!-- END HERO -->
 
 
 
