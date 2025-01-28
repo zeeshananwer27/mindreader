@@ -186,9 +186,9 @@ class AiTemplateSeeder extends Seeder
                         'type' => 'text',
                         'validation' => 'required',
                     ],
-                    'chapter_name' => [
-                        'instraction' => 'chapter_name',
-                        'field_name' => 'chapter_name',
+                    'chapter' => [
+                        'instraction' => 'chapter',
+                        'field_name' => 'chapter',
                         'field_label' => 'Chapter Name',
                         'type' => 'text',
                         'validation' => 'required',
@@ -222,14 +222,12 @@ class AiTemplateSeeder extends Seeder
                         'validation' => 'required',
                     ],
                 ]),
-                'custom_prompt' => 'write detail paragraphs for book with following details:-
-                language of book is: "{language}"
+                'custom_prompt' => 'write multiple paragraphs of topics "{topics}" for chapter "{chapter}" of book "{title}" written in {language}.
+                Also keep in mind the following details when writing:-
                 author details of book is:"{author}"
                 Synopsis of book is: "{synopsis}"
-                name of book is: "{title}"
-                chapter name is: "{chapter}"
-                topics are: "{topics}"
-                note: do not write book synopsis and author details. do not write "topic" keyword with topic title',
+                note: do not write book synopsis, chapter name and author details. write "topic:" keyword with topic title
+                and "Paragraph:" keyword with paragraph start',
                 'total_words' => 0,
                 'status' => "1",
                 'is_default' => "0"

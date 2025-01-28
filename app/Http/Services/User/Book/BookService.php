@@ -31,8 +31,8 @@ class BookService
 
     public function getChapterDetailsByAi($inputData): array
     {
-        //get template to generate author string from default template created by AiTemplate seeder
-        $authorTemplate = AiTemplate::query()->where('uid', '61d3379c-abc1-4be6-90f1-9998ec2d6110')->first();
+        //get template to generate Chapter topics details string from default template created by AiTemplate seeder
+        $authorTemplate = AiTemplate::query()->where('uid', '61d2279c-abc1-4be6-90f1-9448ec2d6f55')->first();
         try {
             return $this->aiService->generateAiContent($inputData, $authorTemplate);
         } catch (Exception $e) {

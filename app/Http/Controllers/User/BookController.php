@@ -10,6 +10,7 @@ use App\Models\AuthorProfile;
 use App\Models\Book;
 use App\Models\BookMedia;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -33,7 +34,7 @@ class BookController extends Controller
         $this->bookService = $bookService;
     }
 
-    public function dashboard()
+    public function dashboard(): View
     {
         $user = auth_user('web');
 
@@ -103,7 +104,6 @@ class BookController extends Controller
         ]);
     }
 
-
     /**
      * Show book details
      *
@@ -112,8 +112,8 @@ class BookController extends Controller
      */
     public function show(string $id): View
     {
-        $book = Book::with(['chapters', 'authorProfile'])
-            ->where('id', $id)
+        $book = Book::with(['chapters.topics', 'authorProfile'])
+            ->where('uid', $id)
             ->where('user_id', $this->user->id)
             ->firstOrFail();
         return view('user.books.show', [
@@ -130,7 +130,7 @@ class BookController extends Controller
      */
     public function edit(string $id): View
     {
-        $book = Book::where('id', $id)->where('user_id', $this->user->id)->firstOrFail();
+        $book = Book::where('uid', $id)->where('user_id', $this->user->id)->firstOrFail();
         $profiles = AuthorProfile::where('user_id', $this->user->id)->get();
 
         return view('user.book.edit', [
@@ -148,7 +148,7 @@ class BookController extends Controller
      */
     public function update(BookRequest $request): RedirectResponse
     {
-        $book = Book::where('id', $request->id)->where('user_id', $this->user->id)->firstOrFail();
+        $book = Book::where('uid', $request->uid)->where('user_id', $this->user->id)->firstOrFail();
         $book->update($request->all());
 
         return redirect()->route('book.manager.list')->with('success', translate('Book updated successfully.'));
@@ -162,7 +162,7 @@ class BookController extends Controller
      */
     public function destroy(string $id): RedirectResponse
     {
-        $book = Book::where('id', $id)->where('user_id', $this->user->id)->firstOrFail();
+        $book = Book::where('uid', $id)->where('user_id', $this->user->id)->firstOrFail();
         $book->delete();
 
         return back()->with('success', translate('Book deleted successfully.'));
@@ -214,15 +214,16 @@ class BookController extends Controller
 
 
     /**
-     * Create a new book
+     * recreate a book
      *
+     * @param $id
      * @return View
      */
-    public function recreate(Book $book): View
+    public function recreate($id): View
     {
         $user = auth()->user();
+        $bookWithChapters = Book::with(['authorProfile', 'chapters'])->where('uid', $id)->where('user_id', $this->user->id)->firstOrFail();
         $authorProfiles = $user->authorProfiles()->get(); // Assuming a relation between users and author profiles
-        $bookWithChapters = $book->load(['authorProfile', 'chapters']);
         $languages = ['English', 'German']; // Language options
 
         return view('user.books.recreate', [
@@ -289,7 +290,7 @@ class BookController extends Controller
                     'success' => true,
                     'text' => trim($text),
                 ]);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Error extracting text from PDF: ' . $e->getMessage(),
@@ -341,14 +342,12 @@ class BookController extends Controller
         }
     }
 
-
     /**
      * Generate an outline for the book.
      *
      * @param Request $request
      * @return JsonResponse
      */
-
     public function generateOutline(Request $request): JsonResponse
     {
         $inputData['synopsis'] = $request->get('book_synopsis') ?? null;

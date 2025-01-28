@@ -70,8 +70,8 @@
                                             <div class="accordion-header">
                                                 <div class="accordion-button collapsed" role="button"
                                                      data-bs-toggle="collapse"
-                                                     data-bs-target="#collapse{{ $book->id }}" aria-expanded="false"
-                                                     aria-controls="collapse{{ $book->id }}">
+                                                     data-bs-target="#collapse{{ $book->uid }}" aria-expanded="false"
+                                                     aria-controls="collapse{{ $book->uid }}">
                                                     <div class="row align-items-center w-100 gy-4 gx-sm-3 gx-0">
                                                         <div class="col-lg-3 col-sm-4 col-12">
                                                             <div class="table-accordion-header transfer-by">
@@ -114,19 +114,19 @@
                                                             <div class="table-accordion-header">
                                                                 <h6>{{ translate("Actions") }}</h6>
                                                                 <div class="d-flex">
-                                                                    <a href="{{ route('user.book.manager.recreate', $book->id) }}"
+                                                                    <a href="{{ route('user.book.manager.recreate', $book->uid) }}"
                                                                        class="btn btn-sm btn-secondary mx-1">
                                                                         <i class="bi bi-reply"></i>
                                                                     </a>
-                                                                    <a href="{{ route('user.book.manager.show', $book->id) }}"
+                                                                    <a href="{{ route('user.book.manager.show', $book->uid) }}"
                                                                        class="btn btn-sm btn-info mx-1">
                                                                         <i class="bi bi-eye"></i>
                                                                     </a>
-                                                                    <a href="{{ route('user.book.manager.edit', $book->id) }}"
+                                                                    <a href="{{ route('user.book.manager.edit', $book->uid) }}"
                                                                        class="btn btn-sm btn-warning mx-1">
                                                                         <i class="bi bi-pencil"></i>
                                                                     </a>
-                                                                    <a href="{{ route('user.book.manager.destroy', $book->id) }}"
+                                                                    <a href="{{ route('user.book.manager.destroy', $book->uid) }}"
                                                                        class="btn btn-sm btn-danger mx-1">
                                                                         <i class="bi bi-trash"></i>
                                                                     </a>
@@ -136,7 +136,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div id="collapse{{ $book->id }}" class="accordion-collapse collapse"
+                                            <div id="collapse{{ $book->uid }}" class="accordion-collapse collapse"
                                                  data-bs-parent="#bookReports">
                                                 <div class="accordion-body">
                                                     <p>{{ translate("Additional book details can go here if needed.") }}</p>
