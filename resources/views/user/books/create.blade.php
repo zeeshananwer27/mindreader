@@ -13,21 +13,21 @@
                                     <div class="step-item text-center">
                                         <button id="complete-step-1"
                                                 class="i-btn btn--primary btn--sm capsuled step-btn">
-                                            {{ translate("Step 1: Book Details") }}
+                                            {{ translate("1: Book Details") }}
                                         </button>
                                     </div>
                                     <div class="step-line"></div>
                                     <div class="step-item text-center">
                                         <button id="complete-step-2"
                                                 class="i-btn btn--outline btn--sm capsuled step-btn" disabled>
-                                            {{ translate("Step 2: Book Synopsis") }}
+                                            {{ translate("2: Book Synopsis") }}
                                         </button>
                                     </div>
                                     <div class="step-line"></div>
                                     <div class="step-item text-center">
                                         <button id="complete-step-3"
                                                 class="i-btn btn--outline btn--sm capsuled step-btn" disabled>
-                                            {{ translate("Step 3: Book Outline") }}
+                                            {{ translate("3: Book Outline") }}
                                         </button>
                                     </div>
                                 </div>
@@ -70,9 +70,9 @@
                                         <div class="form-group mb-4">
                                             <label for="genre"
                                                    class="form-label">{{ translate("What is the genre of the book?") }}</label>
-                                            <select name="genre_id" id="genre" class="form-control">
-                                                @foreach ($genres as $key => $genre)
-                                                    <option value="{{ $key }}">{{ $genre }}</option>
+                                            <select name="genre" id="genre" class="form-control">
+                                                @foreach ($genres as $genre)
+                                                    <option value="{{ $genre }}">{{ $genre }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -175,54 +175,13 @@
 
     <script nonce="{{ csp_nonce() }}">
         $(document).ready(function () {
-            // Handle the button click event
-            $('#save_details').on('click', function (e) {
-                e.preventDefault();  // Prevent the form from submitting normally
-
-                // Serialize the form data (this will include the CSRF token)
-                var formData = $('#generate_data').serialize();
-
-                // Disable the button to prevent multiple submissions
-                $('#save_details').prop('disabled', true);
-                $('#save_details').text('{{ translate("Doing Magic...") }}');
-
-                // Perform the AJAX POST request
-                $.ajax({
-                    url: '{{ route('user.book.manager.store') }}',
-                    type: 'POST',  // HTTP method (POST)
-                    data: formData,  // Form data to be sent
-                    success: function (response) {
-                        // Enable the button back and reset the text
-                        $('#save_details').prop('disabled', false);
-                        $('#save_details').text('{{ translate("Generate Book Using AI Magic") }}');
-
-                        // Check if the response indicates success
-                        if (response.status) {
-                            toastr(response.message, 'success')
-                            window.location.href = "{{route('user.book.dashboard')}}";
-                        } else {
-                            // If there's an error in the response, display the error message
-                            alert(response.message || '{{ translate("Something went wrong. Please try again.") }}');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        // Handle any errors that occurred during the AJAX request
-                        $('#save_details').prop('disabled', false);
-                        $('#save_details').text('{{ translate("Generate Book Using AI Magic") }}');
-                        alert('{{ translate("An error occurred. Please try again.") }}');
-                        console.error("Error: " + error);
-                    }
-                });
-            });
-
 
             $('#generate_synopsis').on('click', function () {
-
                 // Collect form data
                 let formData = {
                     title: $('#title').val(),
                     author_profile_id: $('#authorProfile').val(),
-                    genre_id: $('#genre').val(),
+                    genre: $('#genre').val(),
                     purpose: $('#purpose').val(),
                     target_audience: $('#targetAudience').val(),
                     length: $('#length').val(),
@@ -231,7 +190,8 @@
                 };
 
                 // Disable button and show loading state
-                $('#generate_synopsis').prop('disabled', true).text('{{ translate("Generating...") }}');
+                $('#generate_synopsis').prop('disabled', true);
+                showLoadingSwal("{{translate('Generating synopsis only for you')}}");
 
                 // Perform AJAX request
                 $.ajax({
@@ -239,11 +199,12 @@
                     type: 'POST',
                     data: formData,
                     success: function (response) {
-                        $('#generate_synopsis').prop('disabled', false).text('{{ translate("Generate Synopsis") }}');
+                        $('#generate_synopsis').prop('disabled', false);
 
+                        hideLoadingSwal();
                         if (response.status) {
                             // Populate the synopsis field in step 2
-                            $('#aboutauther').val(response.data.title);
+                            $('#aboutauther').val(response.data.author);
                             $('#booksynopsis').val(response.data.synopsis);
 
                             // Show step 2
@@ -258,7 +219,8 @@
                         }
                     },
                     error: function (xhr, status, error) {
-                        $('#generate_synopsis').prop('disabled', false).text('{{ translate("Generate Synopsis") }}');
+                        $('#generate_synopsis').prop('disabled', false);
+                        hideLoadingSwal();
                         alert('{{ translate("An error occurred. Please try again.") }}');
                         console.error("Error: " + error);
                     }
@@ -275,7 +237,7 @@
                 };
 
                 // Disable button and show loading state
-                $('#book_outline').prop('disabled', true).text('{{ translate("Generating...") }}');
+                $('#book_outline').prop('disabled', true);
 
                 // Perform AJAX request
                 $.ajax({
@@ -283,7 +245,8 @@
                     type: 'POST',
                     data: formData,
                     success: function (response) {
-                        $('#book_outline').prop('disabled', false).text('{{ translate("Generate Book Outline") }}');
+                        $('#book_outline').prop('disabled', false);
+                        hideLoadingSwal();
 
                         if (response.status) {
 
@@ -333,16 +296,51 @@
                         }
                     },
                     error: function (xhr, status, error) {
-
                         $('#chapters-container').html('<p class="text-danger">Failed to load chapters. Please try again later.</p>');
-
-                        $('#book_outline').prop('disabled', false).text('{{ translate("Generate Book Outline") }}');
+                        $('#book_outline').prop('disabled', false);
+                        hideLoadingSwal();
                         alert('{{ translate("An error occurred. Please try again.") }}');
                         console.error("Error: " + error);
                     }
                 });
             });
 
+            $('#save_details').on('click', function (e) {
+                e.preventDefault();  // Prevent the form from submitting normally
+
+                // Serialize the form data (this will include the CSRF token)
+                var formData = $('#generate_data').serialize();
+
+                // Disable the button to prevent multiple submissions
+                $('#save_details').prop('disabled', true);
+                showLoadingSwal("{{translate('Doing Magic')}}");
+                // Perform the AJAX POST request
+                $.ajax({
+                    url: '{{ route('user.book.manager.store') }}',
+                    type: 'POST',  // HTTP method (POST)
+                    data: formData,  // Form data to be sent
+                    success: function (response) {
+                        // Enable the button back and reset the text
+                        $('#save_details').prop('disabled', false);
+                        hideLoadingSwal();
+                        // Check if the response indicates success
+                        if (response.status) {
+                            toastr(response.message, 'success')
+                            window.location.href = "{{route('user.book.dashboard')}}";
+                        } else {
+                            // If there's an error in the response, display the error message
+                            alert(response.message || '{{ translate("Something went wrong. Please try again.") }}');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle any errors that occurred during the AJAX request
+                        $('#save_details').prop('disabled', false);
+                        hideLoadingSwal();
+                        alert('{{ translate("An error occurred. Please try again.") }}');
+                        console.error("Error: " + error);
+                    }
+                });
+            });
         });
     </script>
 @endpush

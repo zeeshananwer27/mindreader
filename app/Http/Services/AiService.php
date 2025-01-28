@@ -134,6 +134,46 @@ class AiService
 
     }
 
+    public function generateAiContent(array $data, AiTemplate $template): array
+    {
+        $logData = [
+            'admin_id' => request()->routeIs('admin.*') ? auth_user('admin')?->id : null,
+            'user_id' => request()->routeIs('user.*') ? auth_user('web')?->id : null,
+            'template_id' => $template->id,
+        ];
+
+        $customPrompt = $template->custom_prompt;
+
+        if ($data && $template->prompt_fields) {
+            foreach ($template->prompt_fields as $key => $input) {
+                $customPrompt = str_replace("{" . $key . "}", Arr::get($data, $key, "",), $customPrompt);
+            }
+        }
+
+        $getBadWords = site_settings('ai_bad_words');
+
+        $processBadWords = $getBadWords
+            ? explode(",", $getBadWords)
+            : [];
+
+        if (is_array($processBadWords)) {
+            $customPrompt = str_replace($processBadWords, "", $customPrompt);
+        }
+
+        $aiParams = ['model' => 'gpt-3.5-turbo'];
+        $language = $data['language'];
+        if ($language != 'English') {
+            $customPrompt .= " \n The language is $language. ";
+        }
+
+        $aiParams['messages'] = [[
+            "role" => "user",
+            "content" => $customPrompt
+        ]];
+        return $this->generateContent($aiParams, $logData);
+
+    }
+
     public function generatreContent(Request $request, AiTemplate $template): array
     {
         $logData ['template_id'] = $template->id;
@@ -206,8 +246,6 @@ class AiService
      */
     public function generateContent(array $aiParams, array $logData): array
     {
-
-
         $status = false;
         $message = translate("Invalid Request");
 
