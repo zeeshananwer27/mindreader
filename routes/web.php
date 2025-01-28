@@ -330,7 +330,7 @@ Route::middleware($globalMiddleware)->group(function () {
         Route::get('/pages/{slug}', 'page')->name('page');
         Route::get('/integrations/{slug}/{uid}', 'integration')->name('integration');
         Route::get('/services/{slug}/{uid}', 'service')->name('service');
-
+        Route::get('/book/{uid}/landing', 'bookPreview')->name('book.landing');
     });
 
     #Coummunication route
