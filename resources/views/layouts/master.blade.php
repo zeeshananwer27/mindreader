@@ -19,7 +19,6 @@
     <link nonce="{{ csp_nonce() }}" href="{{asset('assets/global/css/aos.css')}}?v={{ time() }}" rel="stylesheet" type="text/css" />
     <link nonce="{{ csp_nonce() }}" href="{{asset('assets/frontend/css/root.css')}}?v={{ time() }}" rel="stylesheet" type="text/css" />
     <link nonce="{{ csp_nonce() }}" href="{{asset('assets/frontend/css/common.css')}}?v={{ time() }}" rel="stylesheet" type="text/css" />
-    <link nonce="{{ csp_nonce() }}" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.15.10/dist/sweetalert2.min.css" rel="stylesheet" type="text/css" />
       @if(request()->routeIs('user.*'))
          <link nonce="{{ csp_nonce() }}" href="{{asset('assets/frontend/css/dashboard.css')}}?v={{ time() }}" rel="stylesheet" type="text/css" />
          <link nonce="{{ csp_nonce() }}" href="{{asset('assets/global/css/simplebar.min.css')}}?v={{ time() }}" rel="stylesheet" type="text/css" />
@@ -129,9 +128,7 @@
     <script nonce="{{ csp_nonce() }}" src="{{asset('assets/global/js/select2.min.js')}}?v={{ time() }}"></script>
     <script nonce="{{ csp_nonce() }}" src="{{asset('assets/global/js/aos.js')}}?v={{ time() }}"></script>
     <script nonce="{{ csp_nonce() }}" src="{{asset('assets/global/js/purify.js')}}?v={{ time() }}"></script>
-    <script nonce="{{ csp_nonce() }}" src="https://cdn.jsdelivr.net/npm/sweetalert2@11.15.10/dist/sweetalert2.all.min.js"></script>
-
-      @if(request()->routeIs('user.*'))
+    @if(request()->routeIs('user.*'))
       <script nonce="{{ csp_nonce() }}" src="{{asset('assets/frontend/js/dashboard.js')}}?v={{ time() }}"></script>
       <script nonce="{{ csp_nonce() }}" src="{{asset('assets/global/js/simplebar.min.js')}}?v={{ time() }}"></script>
       <script nonce="{{ csp_nonce() }}" src="{{asset('assets/frontend/js/initiate.js')}}?v={{ time() }}"></script>
@@ -366,30 +363,6 @@
             e.preventDefault();
         });
 
-      function showLoadingSwal(title=" ") {
-          Swal.fire({
-              title: "",
-              html: `
-                    <div class="swal-custom">
-                      <img src="/assets/images/processing.gif" width="300" alt="{{translate('Processing')}}...">
-                      <p class="swal-processing-text loading">${title}</p>
-                    </div>
-                  `,
-              width: 500,
-              padding: "1em",
-              background: "transparent",
-              showConfirmButton: false,
-              allowOutsideClick: false,
-              allowEscapeKey: false,
-              allowEnterKey: false,
-              backdrop: `rgba(0, 0, 0, 0.7)`
-          });
-      }
-
-      // Global function to hide the loading Swal
-      function hideLoadingSwal() {
-          Swal.close();
-      }
     </script>
 
     @include('partials.notify')
