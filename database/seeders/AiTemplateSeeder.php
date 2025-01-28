@@ -214,13 +214,21 @@ class AiTemplateSeeder extends Seeder
                         'type' => 'text',
                         'validation' => 'required',
                     ],
+                    'language' => [
+                        'instraction' => 'language',
+                        'field_name' => 'language',
+                        'field_label' => 'language',
+                        'type' => 'text',
+                        'validation' => 'required',
+                    ],
                 ]),
                 'custom_prompt' => 'write detail paragraphs for book with following details:-
+                language of book is: "{language}"
+                author details of book is:"{author}"
+                Synopsis of book is: "{synopsis}"
+                name of book is: "{title}"
                 chapter name is: "{chapter}"
                 topics are: "{topics}"
-                name of book is: "{title}"
-                Synopsis of book is: "{synopsis}"
-                author details of book is:"{author}"
                 note: do not write book synopsis and author details. do not write "topic" keyword with topic title',
                 'total_words' => 0,
                 'status' => "1",
