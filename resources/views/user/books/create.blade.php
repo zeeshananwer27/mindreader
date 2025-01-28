@@ -13,21 +13,21 @@
                                     <div class="step-item text-center">
                                         <button id="complete-step-1"
                                                 class="i-btn btn--primary btn--sm capsuled step-btn">
-                                            {{ translate("Step 1: Book Details") }}
+                                            {{ translate("1: Book Details") }}
                                         </button>
                                     </div>
                                     <div class="step-line"></div>
                                     <div class="step-item text-center">
                                         <button id="complete-step-2"
                                                 class="i-btn btn--outline btn--sm capsuled step-btn" disabled>
-                                            {{ translate("Step 2: Book Synopsis") }}
+                                            {{ translate("2: Book Synopsis") }}
                                         </button>
                                     </div>
                                     <div class="step-line"></div>
                                     <div class="step-item text-center">
                                         <button id="complete-step-3"
                                                 class="i-btn btn--outline btn--sm capsuled step-btn" disabled>
-                                            {{ translate("Step 3: Book Outline") }}
+                                            {{ translate("3: Book Outline") }}
                                         </button>
                                     </div>
                                 </div>
@@ -70,9 +70,9 @@
                                         <div class="form-group mb-4">
                                             <label for="genre"
                                                    class="form-label">{{ translate("What is the genre of the book?") }}</label>
-                                            <select name="genre_id" id="genre" class="form-control">
-                                                @foreach ($genres as $key => $genre)
-                                                    <option value="{{ $key }}">{{ $genre }}</option>
+                                            <select name="genre" id="genre" class="form-control">
+                                                @foreach ($genres as $genre)
+                                                    <option value="{{ $genre }}">{{ $genre }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -130,19 +130,20 @@
                             </div>
 
                             <div id="step2" class="d-none">
-                                <!-- About Auther -->
+                                <!-- About Author -->
                                 <div class="form-group mb-4">
-                                    <label for="aboutauther" class="form-label">{{ translate("About Auther:") }}</label>
-                                    <textarea name="aboutauther" id="aboutauther" rows="5" class="form-control"
-                                              placeholder="{{ translate("Details about auther.") }}"></textarea>
+                                    <label for="about_author"
+                                           class="form-label">{{ translate("About Author:") }}</label>
+                                    <textarea name="about_author" id="about_author" rows="5" class="form-control"
+                                              placeholder="{{ translate("Details about Author.") }}"></textarea>
 
                                 </div>
 
                                 <!-- book synopsis -->
                                 <div class="form-group mb-4">
-                                    <label for="booksynopsis"
+                                    <label for="book_synopsis"
                                            class="form-label">{{ translate("Book Synopsis:") }}</label>
-                                    <textarea name="booksynopsis" id="booksynopsis" rows="7" class="form-control"
+                                    <textarea name="book_synopsis" id="book_synopsis" rows="7" class="form-control"
                                               placeholder="{{ translate("Details about book.") }}"></textarea>
 
                                 </div>
@@ -156,11 +157,11 @@
 
                             <div id="step3" class="d-none">
 
-                                <h6 class="mt-3">Book Details:</h6>
-                                <input hidden="hidden" id="chapters" name="chapters" type="text">
-                                <div id="chapters-container"></div>
+                                <div class="h3 mb-3" id="book-title"></div>
+                                <div id="chapters-container" class="chapters-container mx-3"></div>
+
                                 <button type="submit" id="save_details"
-                                        class="i-btn btn--primary btn--sm  step-btn">{{ translate("Generate Book Using AI Magic") }}</button>
+                                        class="i-btn btn--primary btn--sm my-5 step-btn">{{ translate("Generate Book Using AI Magic") }}</button>
                             </div>
                         </div>
                     </div>
@@ -175,54 +176,12 @@
 
     <script nonce="{{ csp_nonce() }}">
         $(document).ready(function () {
-            // Handle the button click event
-            $('#save_details').on('click', function (e) {
-                e.preventDefault();  // Prevent the form from submitting normally
-
-                // Serialize the form data (this will include the CSRF token)
-                var formData = $('#generate_data').serialize();
-
-                // Disable the button to prevent multiple submissions
-                $('#save_details').prop('disabled', true);
-                $('#save_details').text('{{ translate("Doing Magic...") }}');
-
-                // Perform the AJAX POST request
-                $.ajax({
-                    url: '{{ route('user.book.manager.store') }}',
-                    type: 'POST',  // HTTP method (POST)
-                    data: formData,  // Form data to be sent
-                    success: function (response) {
-                        // Enable the button back and reset the text
-                        $('#save_details').prop('disabled', false);
-                        $('#save_details').text('{{ translate("Generate Book Using AI Magic") }}');
-
-                        // Check if the response indicates success
-                        if (response.status) {
-                            toastr(response.message, 'success')
-                            window.location.href = "{{route('user.book.dashboard')}}";
-                        } else {
-                            // If there's an error in the response, display the error message
-                            alert(response.message || '{{ translate("Something went wrong. Please try again.") }}');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        // Handle any errors that occurred during the AJAX request
-                        $('#save_details').prop('disabled', false);
-                        $('#save_details').text('{{ translate("Generate Book Using AI Magic") }}');
-                        alert('{{ translate("An error occurred. Please try again.") }}');
-                        console.error("Error: " + error);
-                    }
-                });
-            });
-
-
             $('#generate_synopsis').on('click', function () {
-
                 // Collect form data
                 let formData = {
                     title: $('#title').val(),
                     author_profile_id: $('#authorProfile').val(),
-                    genre_id: $('#genre').val(),
+                    genre: $('#genre').val(),
                     purpose: $('#purpose').val(),
                     target_audience: $('#targetAudience').val(),
                     length: $('#length').val(),
@@ -231,7 +190,8 @@
                 };
 
                 // Disable button and show loading state
-                $('#generate_synopsis').prop('disabled', true).text('{{ translate("Generating...") }}');
+                $('#generate_synopsis').prop('disabled', true);
+                showLoadingSwal("{{translate('Generating synopsis only for you')}}");
 
                 // Perform AJAX request
                 $.ajax({
@@ -239,12 +199,14 @@
                     type: 'POST',
                     data: formData,
                     success: function (response) {
-                        $('#generate_synopsis').prop('disabled', false).text('{{ translate("Generate Synopsis") }}');
+                        $('#generate_synopsis').prop('disabled', false);
 
+                        hideLoadingSwal();
                         if (response.status) {
                             // Populate the synopsis field in step 2
-                            $('#aboutauther').val(response.data.title);
-                            $('#booksynopsis').val(response.data.synopsis);
+                            $('#title').val(response.data.title);
+                            $('#about_author').val(response.data.author);
+                            $('#book_synopsis').val(response.data.synopsis);
 
                             // Show step 2
                             $('#step1').addClass('d-none');
@@ -258,7 +220,8 @@
                         }
                     },
                     error: function (xhr, status, error) {
-                        $('#generate_synopsis').prop('disabled', false).text('{{ translate("Generate Synopsis") }}');
+                        $('#generate_synopsis').prop('disabled', false);
+                        hideLoadingSwal();
                         alert('{{ translate("An error occurred. Please try again.") }}');
                         console.error("Error: " + error);
                     }
@@ -269,13 +232,15 @@
 
                 // Collect form data
                 let formData = {
-                    aboutauther: $('#aboutauther').val(),
-                    booksynopsis: $('#booksynopsis').val(),
+                    about_author: $('#about_author').val(),
+                    book_synopsis: $('#book_synopsis').val(),
+                    title: $('#title').val(),
+                    language: $('#language').val(),
                     _token: '{{ csrf_token() }}'  // Include CSRF token for Laravel security
                 };
 
                 // Disable button and show loading state
-                $('#book_outline').prop('disabled', true).text('{{ translate("Generating...") }}');
+                $('#book_outline').prop('disabled', true);
 
                 // Perform AJAX request
                 $.ajax({
@@ -283,10 +248,9 @@
                     type: 'POST',
                     data: formData,
                     success: function (response) {
-                        $('#book_outline').prop('disabled', false).text('{{ translate("Generate Book Outline") }}');
-
+                        $('#book_outline').prop('disabled', false);
+                        hideLoadingSwal();
                         if (response.status) {
-
                             // Show step 3
                             $('#step3').removeClass('d-none');
                             $('#step2').addClass('d-none');
@@ -294,36 +258,12 @@
                                 .prop('disabled', false)
                                 .removeClass('btn--outline')
                                 .addClass('btn--primary');
-                            if (response.data.length > 0) {
+                            if (response.data.chapters.length > 0) {
                                 $('#chapters-container').empty(); // Clear existing content
+                                $('#book-title').empty(); // Clear existing content
+                                $('#book-title').append(response.data.title); // Clear existing content
+                                loadBookData(response);
 
-                                $('#chapters').val(JSON.stringify(response.data));
-
-                                // Loop through the chapters array and generate HTML
-                                $.each(response.data, function (index, chapter) {
-                                    var chapterId = 'chapter' + index;
-
-                                    var chapterHtml = `
-                                            <div class="card mb-3">
-                                                <div class="fw-bold px-3 py-2 border-bottom"
-                                                     data-bs-toggle="collapse"
-                                                     data-bs-target="#${chapterId}"
-                                                     aria-expanded="false"
-                                                     aria-controls="${chapterId}"
-                                                     role="button">
-                                                    ${chapter.title}
-                                                </div>
-                                                <div id="${chapterId}" class="collapse">
-                                                    <div class="p-3">
-                                                        ${chapter.content}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        `;
-
-                                    // Append generated HTML to the container
-                                    $('#chapters-container').append(chapterHtml);
-                                });
                             } else {
                                 $('#chapters-container').html('<p class="text-danger">No chapters available.</p>');
                             }
@@ -333,16 +273,237 @@
                         }
                     },
                     error: function (xhr, status, error) {
-
                         $('#chapters-container').html('<p class="text-danger">Failed to load chapters. Please try again later.</p>');
-
-                        $('#book_outline').prop('disabled', false).text('{{ translate("Generate Book Outline") }}');
+                        $('#book_outline').prop('disabled', false);
+                        hideLoadingSwal();
                         alert('{{ translate("An error occurred. Please try again.") }}');
                         console.error("Error: " + error);
                     }
                 });
             });
 
+            $('#generate_data').on('submit', function (e) {
+                e.preventDefault();  // Prevent the form from submitting normally
+
+                // Serialize the form data (this will include the CSRF token)
+                var formData = $('#generate_data').serializeArray();
+                // Disable the button to prevent multiple submissions
+                $('#save_details').prop('disabled', true);
+                showLoadingSwal("{{translate('Doing Magic')}}");
+                // Perform the AJAX POST request
+                $.ajax({
+                    url: '{{ route('user.book.manager.store') }}',
+                    type: 'POST',  // HTTP method (POST)
+                    data: formData,  // Form data to be sent
+                    success: function (response) {
+                        // Enable the button back and reset the text
+                        $('#save_details').prop('disabled', false);
+                        hideLoadingSwal();
+                        // Check if the response indicates success
+                        if (response.status) {
+                            toastr(response.message, 'success')
+                            window.location.href = "{{route('user.book.dashboard')}}";
+                        } else {
+                            // If there's an error in the response, display the error message
+                            alert(response.message || '{{ translate("Something went wrong. Please try again.") }}');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle any errors that occurred during the AJAX request
+                        $('#save_details').prop('disabled', false);
+                        hideLoadingSwal();
+                        alert('{{ translate("An error occurred. Please try again.") }}');
+                        console.error("Error: " + error);
+                    }
+                });
+            });
+
+            // Function to load the content into the form
+            function loadBookData(data) {
+                const bookData = data.data;
+
+                // Set the book title
+                $('#book-title').text(bookData.title);
+
+                // Clear existing chapters
+                $('#chapters-container').empty();
+
+                // Add select-all checkbox at the start of the chapters container
+                $('#chapters-container').prepend(`
+                    <div class="d-flex justify-content-end align-items-center gap-2 mb-3 right">
+                        <input class="form-check-input" type="checkbox" value="1" id="select-all-images" checked>
+                        <label for="select-all-images" class="mb-0">Add images to all chapters</label>
+                    </div>
+                `);
+
+                // Loop through chapters and create them
+                bookData.chapters.forEach((chapter, index) => {
+                    const chapterHTML = `
+                        <div class="chapter mb-3" data-chapter-index="${index}">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="chapter-number">${index + 1}.</span>
+                                <input type="text"
+                                       name="chapters[${index}][title]"
+                                       value="${chapter.title}"
+                                       class="form-control border-0 flex-grow-1">
+                                <a href="#" class="delete-chapter btn-sm btn btn-outline-danger">
+                                                <i class="bi bi-x-lg"></i>
+                                </a>
+                                <a href="#" class="add-chapter btn-sm btn btn-outline-success">
+                                        <i class="bi bi-plus-lg"></i>
+                                </a>
+                                <label class="d-flex align-items-center gap-1 mb-0">
+                                    <input type="checkbox" value="1" name="chapters[${index}][hasImage]" class="form-check-input chapter-has-image" checked>
+                                    <span>Image</span>
+                                </label>
+                            </div>
+                            <div class="sections-container mt-2 ms-4" id="sections-${index}">
+                                ${chapter.sections.map((section, sectionIndex) => `
+                                    <div class="section mb-2 d-flex align-items-center gap-2">
+                                        <span class="section-number">${sectionIndex + 1}.</span>
+                                        <input type="text"
+                                               name="chapters[${index}][sections][${sectionIndex}][title]"
+                                               value="${section.replace(/^-\s*/, '')}"
+                                               class="form-control border-0 flex-grow-1">
+                                        <a href="#" class="delete-section btn-sm btn btn-outline-warning d-none">
+                                            <i class="bi bi-x-lg"></i>
+                                        </a>
+                                        <a href="#" class="add-section btn-sm btn btn-outline-success d-none">
+                                            <i class="bi bi-plus-lg"></i>
+                                        </a>
+                                </div>`).join('')}
+                            </div>
+                        </div>`;
+                    $('#chapters-container').append(chapterHTML);
+                });
+
+                // Renumber all chapters and sections
+                reNumberChapters();
+            }
+
+            // Function to create a chapter template
+            function createChapter(chapterIndex) {
+                return `
+                        <div class="chapter mb-3" data-chapter-index="${chapterIndex}">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="chapter-number">${chapterIndex + 1}.</span>
+                                <input type="text"
+                                       name="chapters[${chapterIndex}][title]"
+                                       placeholder="Chapter Title"
+                                       class="form-control border-0 flex-grow-1">
+
+                                <a href="#" class="delete-chapter btn-sm btn btn-outline-danger">
+                                    <i class="bi bi-x-lg"></i>
+                                </a>
+                                <a href="#" class="add-chapter btn-sm btn btn-outline-success">
+                                    <i class="bi bi-plus-lg"></i>
+                                </a>
+                                <label class="d-flex align-items-center gap-1 mb-0">
+                                    <input type="checkbox" value="1" name="chapters[${chapterIndex}][hasImage]" class="form-check-input chapter-has-image" checked>
+                                    <span>Image</span>
+                                </label>
+                            </div>
+                            <div class="sections-container mt-2 ms-4" id="sections-${chapterIndex}">
+                                ${createSection(chapterIndex, 0)} <!-- Add a default section -->
+                            </div>
+                        </div>`;
+            }
+
+            // Function to create a section template
+            function createSection(chapterIndex, sectionIndex) {
+                return `
+                        <div class="section mb-2 d-flex align-items-center gap-2 section-hover" data-section-index="${sectionIndex}">
+                            <span class="section-number">${sectionIndex + 1}.</span>
+                            <input type="text"
+                                   name="chapters[${chapterIndex}][sections][${sectionIndex}][title]"
+                                   placeholder="Section Title"
+                                   class="form-control border-0 flex-grow-1">
+                            <a href="#" class="delete-section btn-sm btn btn-outline-warning d-none">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                            <a href="#" class="add-section btn-sm btn btn-outline-success d-none">
+                                <i class="bi bi-plus-lg"></i>
+                            </a>
+                        </div>`
+                    ;
+            }
+
+            // Event listener for the "Select All" checkbox
+            $(document).on('change', '#select-all-images', function () {
+                const isChecked = $(this).is(':checked');
+                $('.chapter-has-image').prop('checked', isChecked); // Check/uncheck all chapter checkboxes
+            });
+
+            // Event listener to update the "Select All" checkbox based on individual checkboxes
+            $(document).on('change', '.chapter-has-image', function () {
+                const allChecked = $('.chapter-has-image').length === $('.chapter-has-image:checked').length;
+                $('#select-all-images').prop('checked', allChecked); // Update the "Select All" checkbox state
+            });
+
+            // Event listeners for adding/deleting sections
+            $(document).on('click', '.add-section', function (e) {
+                e.preventDefault();
+                const chapterIndex = $(this).closest('.chapter').data('chapter-index');
+                const section = $(this).closest('.section');
+                const sectionIndex = section.data('section-index') + 1;
+
+                const sectionHTML = createSection(chapterIndex, sectionIndex);
+                section.after(sectionHTML);
+                reNumberSections(chapterIndex);
+            });
+
+            $(document).on('click', '.delete-section', function (e) {
+                e.preventDefault();
+                const chapterIndex = $(this).closest('.chapter').data('chapter-index');
+                const sectionCount = $(`#sections-${chapterIndex} .section`).length;
+
+                // Only allow deletion if there's more than one section
+                if (sectionCount > 1) {
+                    $(this).closest('.section').remove();
+                    reNumberSections(chapterIndex);
+                } else {
+                    alert('Each chapter must have at least one section.');
+                }
+            });
+
+            // Event listeners for adding/deleting chapters
+            $(document).on('click', '.add-chapter', function (e) {
+                e.preventDefault();
+                const currentChapter = $(this).closest('.chapter');
+                const chapterIndex = currentChapter.data('chapter-index') + 1;
+
+                const chapterHTML = createChapter(chapterIndex);
+                currentChapter.after(chapterHTML);
+                reNumberChapters();
+            });
+
+            $(document).on('click', '.delete-chapter', function (e) {
+                e.preventDefault();
+                $(this).closest('.chapter').remove();
+                reNumberChapters();
+            });
+
+            // Function to renumber sections within a chapter
+            function reNumberSections(chapterIndex) {
+                $(`#sections-${chapterIndex} .section`).each(function (index) {
+                    $(this).find('.section-number').text(`${index + 1}.`);
+                    $(this).data('section-index', index); // Update section index
+                    $(this).find('input').attr('name', `chapters[${chapterIndex}][sections][${index}][title]`);
+                });
+            }
+
+            // Function to renumber chapters and ensure correct numbering for sections
+            function reNumberChapters() {
+                $('#chapters-container .chapter').each(function (index) {
+                    $(this).find('.chapter-number').text(`${index + 1}.`);
+                    $(this).data('chapter-index', index);
+                    $(this).find('input[name^="chapters"]').attr('name', function (_, attr) {
+                        return attr.replace(/\chapters\[\d+\]/, `chapters[${index}]`);
+                    });
+                    $(this).find('.sections-container').attr('id', `sections-${index}`);
+                    reNumberSections(index); // Renumber sections in this chapter
+                });
+            }
         });
     </script>
 @endpush

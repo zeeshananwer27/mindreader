@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use App\Traits\Filterable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Builder;
 
 class Chapter extends Model
 {
@@ -18,8 +19,10 @@ class Chapter extends Model
     protected $fillable = [
         'uid',
         'title',
+        'has_image',
         'content',
         'book_id',
+        'retry_attempts',
         'status',
     ];
 
@@ -42,6 +45,16 @@ class Chapter extends Model
     public function book(): BelongsTo
     {
         return $this->belongsTo(Book::class, 'book_id');
+    }
+
+    /**
+     * Get the chapter content
+     *
+     * @return HasMany
+     */
+    public function topics(): HasMany
+    {
+        return $this->hasMany(ChapterTopic::class, 'chapter_id');
     }
 
     /**

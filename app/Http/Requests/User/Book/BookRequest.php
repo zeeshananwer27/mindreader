@@ -23,13 +23,16 @@ class BookRequest extends FormRequest
     {
         $rules = [
             'author_profile_id' => 'required|exists:custom_author_profiles,id',
-            'genre_id' => ['required'],
+            'title' => ['required'],
             'purpose' => 'required|string|max:1000',
             'target_audience' => 'required|string|max:1000',
-            'length' => 'required|in:small,medium,large',
             'language' => 'required|in:English,German',
-            'booksynopsis' => 'required',
-            'chapters' => 'required',
+            'book_synopsis' => 'required',
+            'about_author' => 'required',
+            'chapters' => 'required|array|min:1',
+            'chapters.*.title' => 'required|string',
+            'chapters.*.sections' => 'required|array|min:1',
+            'chapters.*.sections.*.title' => 'required|string',
         ];
         return $rules;
     }
