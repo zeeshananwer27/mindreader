@@ -1,32 +1,28 @@
 <?php
 
 namespace App\Http\Controllers\User;
-// namespace App\Http\Requests;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\Book\BookRequest;
 use App\Http\Requests\User\Book\GenerateSynopsisRequest;
-use App\Http\Services\AiService;
+use App\Http\Services\User\Book\BookService;
 use App\Models\AuthorProfile;
 use App\Models\Book;
 use App\Models\BookMedia;
-use App\Models\Chapter;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use setasign\Fpdi\Tcpdf\Fpdi;
 use Smalot\PdfParser\Parser;
 
 class BookController extends Controller
 {
     protected $user, $subscription, $remainingBooks;
+    private BookService $bookService;
 
-    protected AiService $aiService;
-
-
-    public function __construct(AiService $aiService)
+    public function __construct(BookService $bookService)
     {
         $this->middleware(function ($request, $next) {
             $this->user = auth_user('web');
@@ -35,11 +31,10 @@ class BookController extends Controller
 
             return $next($request);
         });
-        $this->aiService = $aiService;
+        $this->bookService = $bookService;
     }
 
-
-    public function dashboard()
+    public function dashboard(): View
     {
         $user = auth_user('web');
 
@@ -73,53 +68,6 @@ class BookController extends Controller
     }
 
     /**
-     * Store a new book
-     *
-     * @param BookRequest $request
-     * @return JsonResponse
-     */
-    public function store(BookRequest $request): JsonResponse
-    {
-        // Convert JSON string to PHP array
-        $chaptersArray = json_decode($request->chapters, true);
-        $book = new Book();
-        $book->user_id = auth()->id();
-        $book->author_profile_id = $request->author_profile_id;
-        $book->about_author = $request->aboutauther;
-        $book->genre = $request->genre_id;
-        $book->title = $request->title;
-        $book->purpose = $request->purpose;
-        $book->target_audience = $request->target_audience;
-        $book->length = $request->length;
-        $book->language = $request->language;
-        $book->synopsis = $request->booksynopsis;
-        $book->save();
-
-        // Use Eloquent relationships to create chapters in bulk
-        $chapters = collect($chaptersArray)->map(function ($chapter) use ($book) {
-            return [
-                'uid' => uniqid(),
-                'title' => $chapter['title'],
-                'content' => $chapter['content'],
-                'book_id' => $book->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        });
-
-        // Insert all chapters at once
-        Chapter::insert($chapters->toArray());
-
-        $bookWithChapters = $book->load('chapters');
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Book and chapters saved successfully',
-            'data' => $bookWithChapters,
-        ]);
-    }
-
-    /**
      * Create a new book
      *
      * @return View
@@ -138,11 +86,90 @@ class BookController extends Controller
             'genres' => $genres,
             'book_languages' => $languages,
         ]);
-
     }
 
     /**
-     * Create a new book
+     * Store a new book
+     *
+     * @param BookRequest $request
+     * @return JsonResponse
+     */
+    public function store(BookRequest $request): JsonResponse
+    {
+        $response = $this->bookService->createBook($request);
+        return response()->json([
+            'status' => true,
+            'message' => translate("Book is on his way. Please wait for a moment. Notify you when book is ready."),
+            'data' => $response
+        ]);
+    }
+
+    /**
+     * Show book details
+     *
+     * @param string $id
+     * @return View
+     */
+    public function show(string $id): View
+    {
+        $book = Book::with(['chapters.topics', 'authorProfile'])
+            ->where('uid', $id)
+            ->where('user_id', $this->user->id)
+            ->firstOrFail();
+        return view('user.books.show', [
+            'meta_data' => $this->metaData(['title' => translate('Book Details')]),
+            'book' => $book,
+        ]);
+    }
+
+    /**
+     * Edit a book
+     *
+     * @param string $id
+     * @return View
+     */
+    public function edit(string $id): View
+    {
+        $book = Book::where('uid', $id)->where('user_id', $this->user->id)->firstOrFail();
+        $profiles = AuthorProfile::where('user_id', $this->user->id)->get();
+
+        return view('user.book.edit', [
+            'meta_data' => $this->metaData(['title' => translate('Edit Book')]),
+            'book' => $book,
+            'profiles' => $profiles,
+        ]);
+    }
+
+    /**
+     * Update book details
+     *
+     * @param BookRequest $request
+     * @return RedirectResponse
+     */
+    public function update(BookRequest $request): RedirectResponse
+    {
+        $book = Book::where('uid', $request->uid)->where('user_id', $this->user->id)->firstOrFail();
+        $book->update($request->all());
+
+        return redirect()->route('book.manager.list')->with('success', translate('Book updated successfully.'));
+    }
+
+    /**
+     * Delete a book
+     *
+     * @param string $id
+     * @return RedirectResponse
+     */
+    public function destroy(string $id): RedirectResponse
+    {
+        $book = Book::where('uid', $id)->where('user_id', $this->user->id)->firstOrFail();
+        $book->delete();
+
+        return back()->with('success', translate('Book deleted successfully.'));
+    }
+
+    /**
+     * Recreate External book
      *
      * @return View
      */
@@ -180,22 +207,23 @@ class BookController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Book recreated successfully',
+            'message' => translate("Book recreated successfully"),
             'data' => $book,
         ]);
     }
 
 
     /**
-     * Create a new book
+     * recreate a book
      *
+     * @param $id
      * @return View
      */
-    public function recreate(Book $book): View
+    public function recreate($id): View
     {
         $user = auth()->user();
+        $bookWithChapters = Book::with(['authorProfile', 'chapters'])->where('uid', $id)->where('user_id', $this->user->id)->firstOrFail();
         $authorProfiles = $user->authorProfiles()->get(); // Assuming a relation between users and author profiles
-        $bookWithChapters = $book->load(['authorProfile', 'chapters']);
         $languages = ['English', 'German']; // Language options
 
         return view('user.books.recreate', [
@@ -227,7 +255,7 @@ class BookController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Book recreated successfully',
+            'message' => translate("Book recreated successfully"),
             'data' => $book,
         ]);
     }
@@ -243,70 +271,6 @@ class BookController extends Controller
     }
 
     /**
-     * Show book details
-     *
-     * @param string $id
-     * @return View
-     */
-    public function show(string $id): View
-    {
-        $book = Book::with(['chapters', 'authorProfile'])
-            ->where('id', $id)
-            ->where('user_id', $this->user->id)
-            ->firstOrFail();
-        return view('user.books.show', [
-            'meta_data' => $this->metaData(['title' => translate('Book Details')]),
-            'book' => $book,
-        ]);
-    }
-
-    /**
-     * Edit a book
-     *
-     * @param string $id
-     * @return View
-     */
-    public function edit(string $id): View
-    {
-        $book = Book::where('id', $id)->where('user_id', $this->user->id)->firstOrFail();
-        $profiles = AuthorProfile::where('user_id', $this->user->id)->get();
-
-        return view('user.book.edit', [
-            'meta_data' => $this->metaData(['title' => translate('Edit Book')]),
-            'book' => $book,
-            'profiles' => $profiles,
-        ]);
-    }
-
-    /**
-     * Update book details
-     *
-     * @param BookRequest $request
-     * @return RedirectResponse
-     */
-    public function update(BookRequest $request): RedirectResponse
-    {
-        $book = Book::where('id', $request->id)->where('user_id', $this->user->id)->firstOrFail();
-        $book->update($request->all());
-
-        return redirect()->route('book.manager.list')->with('success', translate('Book updated successfully.'));
-    }
-
-    /**
-     * Delete a book
-     *
-     * @param string $id
-     * @return RedirectResponse
-     */
-    public function destroy(string $id): RedirectResponse
-    {
-        $book = Book::where('id', $id)->where('user_id', $this->user->id)->firstOrFail();
-        $book->delete();
-
-        return back()->with('success', translate('Book deleted successfully.'));
-    }
-
-    /**
      * Generate a synopsis for the book.
      *
      * @param GenerateSynopsisRequest $request
@@ -314,7 +278,7 @@ class BookController extends Controller
      */
     public function generateSynopsis(GenerateSynopsisRequest $request): JsonResponse
     {
-        if ($request->hasFile('pdf_file')){
+        if ($request->hasFile('pdf_file')) {
             $pdfFile = $request->file('pdf_file');
             $pdfPath = $pdfFile->getPathname();
 
@@ -322,67 +286,61 @@ class BookController extends Controller
                 $parser = new Parser();
                 $pdf = $parser->parseFile($pdfPath);
                 $text = $pdf->getText();
-
-                dd($text);
-
                 return response()->json([
                     'success' => true,
                     'text' => trim($text),
                 ]);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Error extracting text from PDF: ' . $e->getMessage(),
                 ], 500);
             }
         }
-        $inputData = $request->only([
-            'author_profile_id',
-            'title',
-            'genre_id',
-            'purpose',
-            'target_audience',
-            'length',
-            'language'
-        ]);
 
-        $author = AuthorProfile::query()->find($inputData['author_profile_id']) ?? null;
-        $authorString = $author ? "(Author details:- Name: {$author->name}, Biography: {$author->biography} , Tone: {$author->tone}, Style: {$author->style} )" : "";
-        $inputFields['author'] = $authorString;
-        $inputFields['genre'] = !empty($inputData['genre_id']) ? get_genre_list()[$inputData['genre_id']] : null;
-        $inputFields['title'] = $inputData['title'] ?? null;
-        $inputFields['purpose'] = $inputData['purpose'] ?? null;
-        $inputFields['targetAudience'] = $inputData['target_audience'] ?? null;
-        $inputFields['length'] = $inputData['length'] ?? null;
-        $inputFields['language'] = $inputData['language'] ?? null;
+        //filter only required data
+        $inputData = $request->only(['author_profile_id', 'title', 'genre', 'purpose', 'target_audience', 'length', 'language']);
 
-        $request['custom'] = $inputFields;
 
-        /*$synopsisTemplate = AiTemplate::query()->find(1);
-        try {
-            $response = $this->aiService->generatreContent($request, $synopsisTemplate);
-            $response['author'] = $authorString;
-            // Return the JSON response
-            return response()->json(json_decode($response));
-
-        } catch (Exception $e) {
-            return response()->json([
-                "status" => false,
-                "message" => $e->getMessage(),
-            ]);
-        }*/
-
-        // Generate the synopsis
-        $data['title'] = $authorString;
-        $data['synopsis'] = "This is a generated synopsis for the book titled '" . $inputFields['title'] . "'.";
-
-        // Return the JSON response
+        // For Testing remove this when ready for live.
+        $data['title'] = 'PHP Programming';
+        $data['synopsis'] = '"PHP Programming" is a concise guide aimed at readers looking to transition from Java to PHP. This book serves as a resource for understanding the fundamental differences between the two programming languages and mastering key concepts in PHP. Covering topics such as syntax, data types, functions, and object-oriented programming, "PHP Programming" provides practical examples and exercises to reinforce learning. Whether you are a beginner in PHP or an experienced developer looking to expand your skills, this book is designed to help you make a seamless switch and excel in PHP programming within the Art & Photography industry.';
+        $data['author'] = 'Willium is a young and innovative author with a background in data science and technology. He has a passion for using data-driven solutions to solve complex problems and has worked on projects involving machine learning and web development. Despite his busy academic schedule, Willium remains dedicated to his family and is known for his reliability and commitment. He aims to contribute to industries such as production engineering and digital transformation through his innovative data-driven solutions.';
         return response()->json([
             'data' => $data,
             'status' => true,
         ]);
-    }
+        // For Testing remove this when ready for live.
 
+
+        // code to get Author Details generated by AI
+        $authorData = $this->bookService->getAuthorDetailsByAi($inputData);
+        if ($authorData['status']) {
+            $data['author'] = $authorData['message'];
+        } else {
+            return response()->json([
+                'message' => $authorData['message'],
+                'status' => false,
+            ]);
+        }
+
+        $data['title'] = $inputData['title'];
+
+        // code to get Synopsis generated by AI
+        $synopsisData = $this->bookService->getSynopsisByAi($inputData);
+        if ($synopsisData['status']) {
+            $data['synopsis'] = $synopsisData['message'];
+            return response()->json([
+                'data' => $data,
+                'status' => true,
+            ]);
+        } else {
+            return response()->json([
+                'message' => $synopsisData['message'],
+                'status' => false,
+            ]);
+        }
+    }
 
     /**
      * Generate an outline for the book.
@@ -390,42 +348,25 @@ class BookController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-
     public function generateOutline(Request $request): JsonResponse
     {
-        $inputData = $request->only([
-            'booksynopsis',
-            'aboutauther',
-        ]);
+        $inputData['synopsis'] = $request->get('book_synopsis') ?? null;
+        $inputData['author'] = $request->get('about_author') ?? null;
+        $inputData['title'] = $request->get('title') ?? "";
+        $inputData['language'] = $request->get('language') ?? "English";
 
-        $inputFields['synopsis'] = $inputData['booksynopsis'] ?? null;
-        $inputFields['author'] = $inputData['aboutauther'] ?? null;
+        $chapterData = $this->bookService->getBookChapterAndOutlinesByAi($inputData);
 
-        $request['custom'] = $inputFields;
-
-        /* $outlineTemplate = AiTemplate::query()->find(2);
-         try {
-             $response = $this->aiService->generatreContent($request, $outlineTemplate);
-             // Return the JSON response
-             return response()->json(json_decode($response));
-
-         } catch (Exception $e) {
-             return response()->json([
-                 "status" => false,
-                 "message" => $e->getMessage(),
-             ]);
-         }*/
-
-        $chapters = [
-            ['title' => 'Introduction', 'content' => 'This is the introduction.'],
-            ['title' => 'Chapter 1', 'content' => 'This is chapter 1.'],
-            ['title' => 'Chapter 2', 'content' => 'This is chapter 2.'],
-        ];
-
-        // Return the JSON response
-        return response()->json([
-            'data' => $chapters,
-            'status' => true,
-        ]);
+        if ($chapterData['status']) {
+            return response()->json([
+                'data' => $chapterData['message'],
+                'status' => true,
+            ]);
+        } else {
+            return response()->json([
+                'message' => $chapterData['message'],
+                'status' => false,
+            ]);
+        }
     }
 }

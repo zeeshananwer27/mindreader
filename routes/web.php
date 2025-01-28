@@ -275,8 +275,8 @@ Route::middleware($globalMiddleware)->group(function () {
             Route::controller(BookController::class)->name('manager.')->prefix('manager/')->group(function () {
                 Route::any('/list', 'list')->name('list'); // List all books
                 Route::get('/create', 'create')->name('create'); // Display book creation form
-                Route::get('/recreate/{book}', 'recreate')->name('recreate');
-                Route::post('/recreate/{book}/store', 'recreateSave')->name('recreate.store'); // Store new book
+                Route::get('/recreate/{id}', 'recreate')->name('recreate');
+                Route::post('/recreate/{id}/store', 'recreateSave')->name('recreate.store'); // Store new book
                 Route::get('/recreate-external', 'recreateExternal')->name('recreate.external');
                 Route::post('/recreate-external/store', 'recreateExternalSave')->name('recreate.external.store'); // Store new book
                 Route::post('/store', 'store')->name('store'); // Store new book
