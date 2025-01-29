@@ -105,24 +105,6 @@ class BookController extends Controller
     }
 
     /**
-     * Show book details
-     *
-     * @param string $id
-     * @return View
-     */
-    public function show(string $id): View
-    {
-        $book = Book::with(['chapters.topics', 'authorProfile'])
-            ->where('uid', $id)
-            ->where('user_id', $this->user->id)
-            ->firstOrFail();
-        return view('user.books.show', [
-            'meta_data' => $this->metaData(['title' => translate('Book Details')]),
-            'book' => $book,
-        ]);
-    }
-
-    /**
      * Edit a book
      *
      * @param string $id

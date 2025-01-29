@@ -118,7 +118,7 @@
                                                                        class="btn btn-sm btn-secondary mx-1">
                                                                         <i class="bi bi-reply"></i>
                                                                     </a>
-                                                                    <a href="{{ route('user.book.manager.show', $book->uid) }}"
+                                                                    <a href="{{ route('book.view', $book->uid) }}"
                                                                        class="btn btn-sm btn-info mx-1">
                                                                         <i class="bi bi-eye"></i>
                                                                     </a>

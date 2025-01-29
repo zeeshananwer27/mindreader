@@ -100,6 +100,10 @@ class GenerateChapterDetailsJob implements ShouldQueue
             }
         }
 
+        $this->book->update([
+            'status' => "active",
+        ]);
+
         Log::info("Finished processing chapters for book: {$this->book->id}");
     }
 

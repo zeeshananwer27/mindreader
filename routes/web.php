@@ -11,6 +11,7 @@ use App\Http\Controllers\User\Auth\RegisterController;
 use App\Http\Controllers\User\Auth\SocialAuthController;
 use App\Http\Controllers\User\AuthorProfileController;
 use App\Http\Controllers\User\BookController;
+use App\Http\Controllers\BookController as FrontBookController;
 use App\Http\Controllers\User\DepositController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\ReportController;
@@ -320,6 +321,10 @@ Route::middleware($globalMiddleware)->group(function () {
 
     });
 
+    Route::prefix('book/')->name('book.')->group(function () {
+        Route::get('/{uid}/landing', [FrontBookController::class, 'landing'])->name('landing');
+        Route::get('/{uid}/view', [FrontBookController::class, 'view'])->name('view');
+    });
 
     Route::controller(FrontendController::class)->group(function () {
 
@@ -330,7 +335,6 @@ Route::middleware($globalMiddleware)->group(function () {
         Route::get('/pages/{slug}', 'page')->name('page');
         Route::get('/integrations/{slug}/{uid}', 'integration')->name('integration');
         Route::get('/services/{slug}/{uid}', 'service')->name('service');
-        Route::get('/book/{uid}/landing', 'bookPreview')->name('book.landing');
     });
 
     #Coummunication route
