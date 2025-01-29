@@ -110,15 +110,20 @@ class BookController extends Controller
      * @param string $id
      * @return View
      */
-    public function edit(string $id): View
+    public function detail(string $id): View
     {
-        $book = Book::where('uid', $id)->where('user_id', $this->user->id)->firstOrFail();
-        $profiles = AuthorProfile::where('user_id', $this->user->id)->get();
+        $book = Book::with(['chapters.topics', 'authorProfile'])
+            ->where('uid', $id)->where('user_id', $this->user->id)->firstOrFail();
+        $authorProfiles = AuthorProfile::where('user_id', $this->user->id)->get();
+        $genres = get_genre_list(); // Fetch available genres
+        $languages = ['English', 'German']; // Language options
 
-        return view('user.book.edit', [
-            'meta_data' => $this->metaData(['title' => translate('Edit Book')]),
+        return view('user.books.edit.detail', [
+            'meta_data' => $this->metaData(['title' => translate('Book Detail')]),
             'book' => $book,
-            'profiles' => $profiles,
+            'authorProfiles' => $authorProfiles,
+            'genres' => $genres,
+            'book_languages' => $languages,
         ]);
     }
 

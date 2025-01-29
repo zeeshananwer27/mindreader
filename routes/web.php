@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookController as FrontBookController;
 use App\Http\Controllers\CommunicationsController;
 use App\Http\Controllers\CoreController;
 use App\Http\Controllers\FrontendController;
@@ -11,7 +12,6 @@ use App\Http\Controllers\User\Auth\RegisterController;
 use App\Http\Controllers\User\Auth\SocialAuthController;
 use App\Http\Controllers\User\AuthorProfileController;
 use App\Http\Controllers\User\BookController;
-use App\Http\Controllers\BookController as FrontBookController;
 use App\Http\Controllers\User\DepositController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\ReportController;
@@ -281,10 +281,13 @@ Route::middleware($globalMiddleware)->group(function () {
                 Route::get('/recreate-external', 'recreateExternal')->name('recreate.external');
                 Route::post('/recreate-external/store', 'recreateExternalSave')->name('recreate.external.store'); // Store new book
                 Route::post('/store', 'store')->name('store'); // Store new book
-                Route::get('/edit/{id}', 'edit')->name('edit'); // Edit an existing book
                 Route::post('/update', 'update')->name('update'); // Update book details
                 Route::get('/destroy/{id}', 'destroy')->name('destroy'); // Delete a book
                 Route::get('/show/{id}', 'show')->name('show'); // Display book details
+
+                Route::name('edit.')->group(function () {
+                    Route::get('/{id}/detail', 'detail')->name('detail'); // Edit an existing book
+                });
 
                 # Book Content
                 Route::post('/synopsis/generate', 'generateSynopsis')->name('synopsis.generate'); // Generate book synopsis
