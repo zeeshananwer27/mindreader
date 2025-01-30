@@ -166,6 +166,10 @@ class AiService
             $customPrompt .= " \n The language is $language. ";
         }
 
+        if ($data['pdf_text'] != null) {
+            $customPrompt .= " \n Book details are {$data['pdf_text']} ";
+        }
+
         $aiParams['messages'] = [[
             "role" => "user",
             "content" => $customPrompt

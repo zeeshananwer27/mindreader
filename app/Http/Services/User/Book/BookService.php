@@ -39,9 +39,11 @@ class BookService
             'author_profile_id', 'about_author', 'title', 'purpose',
             'genre', 'target_audience', 'language', 'length', 'synopsis'
         ]));
-
+        $book->status = "draft";
         if (!$book->exists) {
             $book->user_id = auth()->id();
+            $book->genre = "-";
+            $book->length = "small";
         }
 
         $book->save();
@@ -270,6 +272,7 @@ class BookService
         $tempData['tone'] = $author->tone;
         $tempData['style'] = $author->style;
         $tempData['language'] = $inputData['language'] ?? "English";
+        $tempData['pdf_text'] = $inputData['pdf_text'] ?? null;
 
         //get template to generate author string from default template created by AiTemplate seeder
         $authorTemplate = AiTemplate::query()->where('uid', '61d3379c-abc1-4be6-90f1-9998ec2d6110')->first();

@@ -141,8 +141,6 @@
     </div>
 
 @endsection
-<!-- jQuery AJAX Script -->
-<!-- jQuery Script -->
 
 @push('script-push')
 

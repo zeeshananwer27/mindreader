@@ -157,21 +157,11 @@ class BookController extends Controller
      */
     public function recreateExternalSave(Request $request): JsonResponse
     {
-        $book = new Book();
-        $book->author_profile_id = $request->author_profile_id;
-        $book->about_author = $request->aboutauther;
-        $book->title = $request->title;
-        $book->purpose = $request->change;
-        $book->target_audience = $request->target_audience;
-        $book->length = $request->length;
-        $book->language = $request->language;
-        $book->synopsis = $request->booksynopsis;
-        $book->save();
+        $this->bookService->reCreateBook($request, null);
 
         return response()->json([
             'status' => true,
-            'message' => translate("Book recreated successfully"),
-            'data' => $book,
+            'message' => translate("Book recreated successfully from external book"),
         ]);
     }
 
@@ -235,6 +225,7 @@ class BookController extends Controller
      */
     public function generateSynopsis(GenerateSynopsisRequest $request): JsonResponse
     {
+        $pdfText = null;
         if ($request->hasFile('pdf_file')) {
             $pdfFile = $request->file('pdf_file');
             $pdfPath = $pdfFile->getPathname();
@@ -242,11 +233,15 @@ class BookController extends Controller
             try {
                 $parser = new Parser();
                 $pdf = $parser->parseFile($pdfPath);
-                $text = $pdf->getText();
-                return response()->json([
-                    'success' => true,
-                    'text' => trim($text),
-                ]);
+                $details = $pdf->getDetails();
+                $bookTitle = $details['Title'] ?? null;
+                // Get all pages
+                $pages = $pdf->getPages();
+                $text = '';
+                for ($i = 0; $i < min(2, count($pages)); $i++) {
+                    $text .= $pages[$i]->getText() . "\n\n"; // Append each page's text
+                }
+                $pdfText = 'Title of book="' . $bookTitle . '" Description of book="' . trim($text) . '"';
             } catch (Exception $e) {
                 return response()->json([
                     'success' => false,
@@ -256,8 +251,8 @@ class BookController extends Controller
         }
 
         //filter only required data
-        $inputData = $request->only(['author_profile_id', 'title', 'genre', 'purpose', 'target_audience', 'length', 'language']);
-
+        $inputData = $request->only(['author_profile_id', 'title', 'purpose', 'target_audience', 'language']);
+        $inputData['pdf_text'] = $pdfText;
 
         // For Testing remove this when ready for live.
         $data['title'] = 'PHP Programming';
