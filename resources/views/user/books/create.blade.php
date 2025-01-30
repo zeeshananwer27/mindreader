@@ -241,6 +241,7 @@
 
                 // Disable button and show loading state
                 $('#book_outline').prop('disabled', true);
+                showLoadingSwal("{{translate('Generating book outlines for you')}}");
 
                 // Perform AJAX request
                 $.ajax({

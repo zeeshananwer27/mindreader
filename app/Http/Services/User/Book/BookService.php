@@ -22,66 +22,65 @@ class BookService
 
     public function createBook(BookRequest $request): Book
     {
-        $book = $this->saveBookChapterToDb($request);
+        $book = $this->saveBookToDb($request);
+        $this->saveChaptersToDb($request->chapters, $book);
+
         // here write the functionality to run job class
         GenerateChapterDetailsJob::dispatch($book)->onQueue('default');
 
         return $book;
     }
 
-    public function getChapterDetailsByAi($inputData): array
+    private function saveBookToDb($request, Book $book = null): Book
     {
-        //get template to generate Chapter topics details string from default template created by AiTemplate seeder
-        $authorTemplate = AiTemplate::query()->where('uid', '61d2279c-abc1-4be6-90f1-9448ec2d6f55')->first();
-        try {
-            return $this->aiService->generateAiContent($inputData, $authorTemplate);
-        } catch (Exception $e) {
-            return [
-                "status" => false,
-                "message" => $e->getMessage(),
-            ];
+        $book = $book ?? new Book();
+
+        $book->fill($request->only([
+            'author_profile_id', 'about_author', 'title', 'purpose',
+            'genre', 'target_audience', 'language', 'length', 'synopsis'
+        ]));
+
+        if (!$book->exists) {
+            $book->user_id = auth()->id();
         }
+
+        $book->save();
+        $book->refresh();
+
+        return $book;
     }
 
-    public function getAuthorDetailsByAi($inputData): array
+    private function saveChaptersToDb($chaptersArray, $book): void
     {
-        $author = AuthorProfile::query()->find($inputData['author_profile_id']);
-        $tempData['name'] = $author->name;
-        $tempData['biography'] = $author->biography;
-        $tempData['tone'] = $author->tone;
-        $tempData['style'] = $author->style;
-        $tempData['language'] = $inputData['language'] ?? "English";
-
-        //get template to generate author string from default template created by AiTemplate seeder
-        $authorTemplate = AiTemplate::query()->where('uid', '61d3379c-abc1-4be6-90f1-9998ec2d6110')->first();
-        try {
-            return $this->aiService->generateAiContent($tempData, $authorTemplate);
-        } catch (Exception $e) {
+        $chapters = collect($chaptersArray)->map(function ($chapter) use ($book) {
             return [
-                "status" => false,
-                "message" => $e->getMessage(),
+                'uid' => uniqid(),
+                'title' => $chapter['title'],
+                'content' => json_encode($chapter['sections']),
+                'book_id' => $book->id,
+                'has_image' => $chapter['has_image'] ?? false,
+                'created_at' => now(),
+                'updated_at' => now(),
             ];
-        }
+        });
+        Chapter::insert($chapters->toArray());
     }
 
-    public function getSynopsisByAi($inputData): array
+    public function reCreateBook($request, $book): Book
     {
-        //get template to generate synopsis string from default template created by AiTemplate seeder
-        $synopsisTemplate = AiTemplate::query()->where('uid', 'c4e1e23d-11dd-4545-a080-eeb4e25f5f74')->first();
-        try {
-            $response = $this->aiService->generateAiContent($inputData, $synopsisTemplate);
-            preg_match('/Synopsis:(.+)/s', $response['message'], $matches);
-            $synopsis = $matches[1] ?? $response['message'];
-            return [
-                "status" => true,
-                "message" => trim($synopsis),
-            ];
-        } catch (Exception $e) {
-            return [
-                "status" => false,
-                "message" => $e->getMessage(),
-            ];
-        }
+        $book = $this->saveBookToDb($request, $book);
+        //create required object to pass to AI model
+        $inputData['synopsis'] = $book->synopsis;
+        $inputData['author'] = $book->about_author;
+        $inputData['title'] = $book->title;
+        $inputData['language'] = $book->language;
+
+        $chaptersData = $this->getBookChapterAndOutlinesByAi($inputData);
+        $chaptersArray = $chaptersData['message']['chapters'];
+        $this->saveChaptersToDb($chaptersArray, $book);
+
+        GenerateChapterDetailsJob::dispatch($book)->onQueue('default');
+        return $book;
     }
 
     public function getBookChapterAndOutlinesByAi($inputData): array
@@ -249,38 +248,58 @@ class BookService
         return $jsonData;
     }
 
-    private function saveBookChapterToDb($request): Book
+    public function getChapterDetailsByAi($inputData): array
     {
-        $book = new Book();
-        $book->user_id = auth()->id();
-        $book->author_profile_id = $request->get('author_profile_id') ?? null;
-        $book->about_author = $request->get('about_author') ?? null;
-        $book->genre = $request->get('genre') ?? null;
-        $book->title = $request->get('title') ?? null;
-        $book->purpose = $request->get('purpose') ?? null;
-        $book->target_audience = $request->get('target_audience') ?? null;
-        $book->length = $request->get('length') ?? null;
-        $book->language = $request->get('language') ?? null;
-        $book->synopsis = $request->get('book_synopsis') ?? null;
-        $book->save();
-
-        $chaptersArray = $request->chapters;
-        // Use Eloquent relationships to create chapters in bulk
-        $chapters = collect($chaptersArray)->map(function ($chapter) use ($book) {
+        //get template to generate Chapter topics details string from default template created by AiTemplate seeder
+        $authorTemplate = AiTemplate::query()->where('uid', '61d2279c-abc1-4be6-90f1-9448ec2d6f55')->first();
+        try {
+            return $this->aiService->generateAiContent($inputData, $authorTemplate);
+        } catch (Exception $e) {
             return [
-                'uid' => uniqid(),
-                'title' => $chapter['title'],
-                'content' => json_encode($chapter['sections']),
-                'book_id' => $book->id,
-                'has_image' => $chapter['has_image'] ?? false,
-                'created_at' => now(),
-                'updated_at' => now(),
+                "status" => false,
+                "message" => $e->getMessage(),
             ];
-        });
+        }
+    }
 
-        // Insert all chapters at once
-        Chapter::insert($chapters->toArray());
+    public function getAuthorDetailsByAi($inputData): array
+    {
+        $author = AuthorProfile::query()->find($inputData['author_profile_id']);
+        $tempData['name'] = $author->name;
+        $tempData['biography'] = $author->biography;
+        $tempData['tone'] = $author->tone;
+        $tempData['style'] = $author->style;
+        $tempData['language'] = $inputData['language'] ?? "English";
 
-        return $book->load('chapters');
+        //get template to generate author string from default template created by AiTemplate seeder
+        $authorTemplate = AiTemplate::query()->where('uid', '61d3379c-abc1-4be6-90f1-9998ec2d6110')->first();
+        try {
+            return $this->aiService->generateAiContent($tempData, $authorTemplate);
+        } catch (Exception $e) {
+            return [
+                "status" => false,
+                "message" => $e->getMessage(),
+            ];
+        }
+    }
+
+    public function getSynopsisByAi($inputData): array
+    {
+        //get template to generate synopsis string from default template created by AiTemplate seeder
+        $synopsisTemplate = AiTemplate::query()->where('uid', 'c4e1e23d-11dd-4545-a080-eeb4e25f5f74')->first();
+        try {
+            $response = $this->aiService->generateAiContent($inputData, $synopsisTemplate);
+            preg_match('/Synopsis:(.+)/s', $response['message'], $matches);
+            $synopsis = $matches[1] ?? $response['message'];
+            return [
+                "status" => true,
+                "message" => trim($synopsis),
+            ];
+        } catch (Exception $e) {
+            return [
+                "status" => false,
+                "message" => $e->getMessage(),
+            ];
+        }
     }
 }

@@ -1665,6 +1665,18 @@ if (!function_exists('getAILanguages')) {
     }
 }
 
+if (!function_exists('getLanguages')) {
+
+
+    /**
+     * Summary of getAILanguages
+     * @return array
+     */
+    function getLanguages(): array
+    {
+        return ['English', 'German'];
+    }
+}
 
 if (!function_exists('get_genre_list')) {
 
