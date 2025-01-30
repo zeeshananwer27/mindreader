@@ -96,47 +96,12 @@ class BookController extends Controller
      */
     public function store(BookRequest $request): JsonResponse
     {
+        dd($request);
         $response = $this->bookService->createBook($request);
         return response()->json([
             'status' => true,
             'message' => translate("Book is on his way. Please wait for a moment. Notify you when book is ready."),
             'data' => $response
-        ]);
-    }
-
-    /**
-     * Show book details
-     *
-     * @param string $id
-     * @return View
-     */
-    public function show(string $id): View
-    {
-        $book = Book::with(['chapters.topics', 'authorProfile'])
-            ->where('uid', $id)
-            ->where('user_id', $this->user->id)
-            ->firstOrFail();
-        return view('user.books.show', [
-            'meta_data' => $this->metaData(['title' => translate('Book Details')]),
-            'book' => $book,
-        ]);
-    }
-
-    /**
-     * Edit a book
-     *
-     * @param string $id
-     * @return View
-     */
-    public function edit(string $id): View
-    {
-        $book = Book::where('uid', $id)->where('user_id', $this->user->id)->firstOrFail();
-        $profiles = AuthorProfile::where('user_id', $this->user->id)->get();
-
-        return view('user.book.edit', [
-            'meta_data' => $this->metaData(['title' => translate('Edit Book')]),
-            'book' => $book,
-            'profiles' => $profiles,
         ]);
     }
 

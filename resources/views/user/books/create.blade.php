@@ -399,7 +399,7 @@
                                     <i class="bi bi-plus-lg"></i>
                                 </a>
                                 <label class="d-flex align-items-center gap-1 mb-0">
-                                    <input type="checkbox" value="1" name="chapters[${chapterIndex}][hasImage]" class="form-check-input chapter-has-image" checked>
+                                    <input type="checkbox" name="chapters[${chapterIndex}][hasImage]" class="form-check-input chapter-has-image" checked>
                                     <span>Image</span>
                                 </label>
                             </div>

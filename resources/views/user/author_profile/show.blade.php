@@ -5,7 +5,7 @@
         <div class="row mb-12 py-5 i-card">
             <!-- Author Image -->
             <div class="col-12  col-md-3 d-flex justify-content-center mb-4 mb-md-0">
-                <div class="h-64 w-64 rounded-circle overflow-hidden">
+                <div class="avatar-16 rounded-circle overflow-hidden">
                     <img
                         src="{{ $author->image ? asset('storage/' . $author->image)  : asset('assets/images/default/DEFAULT.png') }}"
                         id="authorImagePreview"

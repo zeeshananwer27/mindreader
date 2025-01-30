@@ -5,9 +5,9 @@
         $breadcrumbIMG          = @$breadcrumbContent->file?->where("type",'banner_image')->first();
         $breadcrumbSize         = get_appearance_img_size('breadcrumb','content','banner_image');
     @endphp
- 
-    <div class="inner-banner-wrapper">
-        <div class="inner-banner-img">
+
+    <div class="inner-banner-wrapper @if(request()->routeIs("book.*")) pt-3 @endif">
+        <div class="inner-banner-img  @if(request()->routeIs("book.*")) d-none @endif">
             <img src="{{imageURL($breadcrumbIMG,'frontend',true,$breadcrumbSize)}}" alt="{{@$breadcrumbIMG->file->name??'breadcrumb.jpg'}}">
         </div>
         <div class="container">
@@ -39,11 +39,11 @@
             @if(@$breadcrumbs)
                 @foreach($breadcrumbs as $text => $url)
                     <li class='breadcrumb-item {{$url? "active" :""}}'>
-                        @if($url) 
+                        @if($url)
                                 @php
                                 if (is_string($url) && app('router')->has($url)) {
                                     $url = route($url);
-                                } 
+                                }
                                 @endphp
                             <a href="{{$url}}">{{translate($text)}}</a>
                         @else
@@ -54,8 +54,8 @@
             @else
                 <li class="breadcrumb-item"><a href="{{route('home')}}">{{translate('Home')}}</a></li>
             @endif
-           
+
         </ol>
     </nav>
-   
+
 </section>

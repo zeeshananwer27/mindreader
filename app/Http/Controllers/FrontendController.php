@@ -6,6 +6,7 @@ use App\Models\Admin\Frontend;
 use App\Models\Admin\Menu;
 use App\Models\Admin\Page;
 use App\Models\Blog;
+use App\Models\Book;
 use App\Models\Package;
 use Illuminate\View\View;
 
@@ -26,12 +27,12 @@ class FrontendController extends Controller
      * @return View
      */
     public function home() :View{
-        // echo  env('CURRENT_ACTIVE_THEME'); exit(' iiii'); 
+        // echo  env('CURRENT_ACTIVE_THEME'); exit(' iiii');
         $menu         = Menu::default()->first();
 
 
         if(env('CURRENT_ACTIVE_THEME')=='theme1'){
-         // if(env('CURRENT_ACTIVE_THEME')== ''){   
+         // if(env('CURRENT_ACTIVE_THEME')== ''){
             return view('frontend.home_theme1',[
                 'meta_data' => $this->metaData([
                                     "title"               =>  $menu->meta_title,
@@ -200,4 +201,7 @@ class FrontendController extends Controller
             'banner'       => (object) ['title' => @$service->value->title , 'description' => limit_words(strip_tags(@$service->value->description),100)]
         ]);
     }
+
+
+
 }

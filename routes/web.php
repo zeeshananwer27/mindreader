@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookController as FrontBookController;
 use App\Http\Controllers\CommunicationsController;
 use App\Http\Controllers\CoreController;
 use App\Http\Controllers\FrontendController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\User\Auth\NewPasswordController;
 use App\Http\Controllers\User\Auth\RegisterController;
 use App\Http\Controllers\User\Auth\SocialAuthController;
 use App\Http\Controllers\User\AuthorProfileController;
+use App\Http\Controllers\User\BookContentController;
 use App\Http\Controllers\User\BookController;
 use App\Http\Controllers\User\DepositController;
 use App\Http\Controllers\User\HomeController;
@@ -280,7 +282,6 @@ Route::middleware($globalMiddleware)->group(function () {
                 Route::get('/recreate-external', 'recreateExternal')->name('recreate.external');
                 Route::post('/recreate-external/store', 'recreateExternalSave')->name('recreate.external.store'); // Store new book
                 Route::post('/store', 'store')->name('store'); // Store new book
-                Route::get('/edit/{id}', 'edit')->name('edit'); // Edit an existing book
                 Route::post('/update', 'update')->name('update'); // Update book details
                 Route::get('/destroy/{id}', 'destroy')->name('destroy'); // Delete a book
                 Route::get('/show/{id}', 'show')->name('show'); // Display book details
@@ -305,6 +306,15 @@ Route::middleware($globalMiddleware)->group(function () {
                 Route::get('/topic/destroy/{id}', 'destroyTopic')->name('topic.destroy'); // Delete a topic
             });
 
+            Route::name('edit.')->group(function () {
+                Route::get('/{id}/details', [BookContentController::class, 'details'])->name('details'); // Edit detail of existing book
+                Route::get('/{id}/synopsis', [BookContentController::class, 'synopsis'])->name('synopsis'); // Edit  synopsis of existing book
+                Route::get('/{id}/outlines', [BookContentController::class, 'outlines'])->name('outlines'); // Edit  outlines of existing book
+                Route::get('/{id}/cover', [BookContentController::class, 'cover'])->name('cover'); // Edit  cover of existing book
+                Route::get('/{id}/chapters/{chapter}', [BookContentController::class, 'chapters'])->name('chapters'); // Edit  chapter of existing book
+                Route::get('/{id}/audio', [BookContentController::class, 'audio'])->name('audio'); // Edit  audio of existing book
+            });
+
             # Author Profile Manager
             Route::controller(AuthorProfileController::class)->name('author.')->prefix('author/')->group(function () {
                 Route::any('/list', 'list')->name('list'); // List all author profiles
@@ -320,6 +330,10 @@ Route::middleware($globalMiddleware)->group(function () {
 
     });
 
+    Route::prefix('book/')->name('book.')->group(function () {
+        Route::get('/{uid}/landing', [FrontBookController::class, 'landing'])->name('landing');
+        Route::get('/{uid}/view', [FrontBookController::class, 'view'])->name('view');
+    });
 
     Route::controller(FrontendController::class)->group(function () {
 
@@ -330,7 +344,6 @@ Route::middleware($globalMiddleware)->group(function () {
         Route::get('/pages/{slug}', 'page')->name('page');
         Route::get('/integrations/{slug}/{uid}', 'integration')->name('integration');
         Route::get('/services/{slug}/{uid}', 'service')->name('service');
-
     });
 
     #Coummunication route
