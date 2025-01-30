@@ -2,6 +2,18 @@
     cursor: pointer !important;
 }
 
+.aside .side-content .sidemenu-wrapper .sidemenu-list .sidemenu-item .sidemenu-link:hover {
+    background: var(--color-primary-light);
+}
+
+.book-menu {
+    min-height: calc(100% - 260px) !important;
+}
+
+.book-menu .sidebar-body {
+    max-height: calc(100dvh - 374px) !important;
+}
+
 .flex-1 {
     flex: 1 1 0;
 }

@@ -13,7 +13,7 @@
         $platform = $platforms?->first()
     @endphp
 
-    @if(request()->routeIs('user.book.manager.edit.*'))
+    @if(request()->routeIs('user.book.edit.*'))
         <div class="side-content">
             <a href="{{route('user.home')}}" class="sidebar-logo d-block">
                 <div class="site-logo">
@@ -25,8 +25,6 @@
             <div class="d-flex flex-column gap-2">
                 <div class="text-muted small">Book Title:</div>
                 <p class="text-xl fw-medium text-break">{{$book->title}}</p>
-
-                <!-- Buttons Row -->
                 <div class="d-flex gap-2 pt-2">
                     <a href="{{route('book.view', $book->uid)}}" target="_blank" class="w-100">
                         <button class="btn btn-primary btn-sm w-100">Preview</button>
@@ -36,55 +34,81 @@
                     </a>
                 </div>
 
-                <!-- Download Button -->
                 <div class="pt-2">
                     <button class="btn btn-primary btn-sm w-100">Download for KDP</button>
                 </div>
             </div>
             <hr>
-            <div class="sidemenu-wrapper">
+            <div class="sidemenu-wrapper book-menu">
                 <div class="sidebar-body" data-simplebar>
                     <ul class="sidemenu-list">
                         <li class="sidemenu-item">
-                            <a href="{{route('user.ai.content.list')}}"
-                               class="sidemenu-link m-0 {{request()->routeIs('user.ai.content.*') ? 'active' :''}}">
+                            <a href="{{route('user.book.edit.details', $book->uid)}}"
+                               class="sidemenu-link m-0 {{request()->routeIs('user.book.edit.details') ? 'active' :''}}">
+                                <div class="sidemenu-icon">
+                                    <i class="bi bi-journal-richtext"></i>
+                                </div>
                                 <span class="fs-12">{{translate("Detail")}}</span>
                             </a>
                         </li>
                         <li class="sidemenu-item">
-                            <a href="{{route('user.ai.content.list')}}"
-                               class="sidemenu-link m-0 {{request()->routeIs('user.ai.content.*') ? 'active' :''}}">
+                            <a href="{{route('user.book.edit.synopsis', $book->uid)}}"
+                               class="sidemenu-link m-0 {{request()->routeIs('user.book.edit.synopsis') ? 'active' :''}}">
+                                <div class="sidemenu-icon">
+                                    <i class="bi bi-journal-text"></i>
+                                </div>
                                 <span class="fs-12">{{translate("Synopsis")}}</span>
                             </a>
                         </li>
                         <li class="sidemenu-item">
-                            <a href="{{route('user.ai.content.list')}}"
-                               class="sidemenu-link m-0 {{request()->routeIs('user.ai.content.*') ? 'active' :''}}">
+                            <a href="{{route('user.book.edit.outlines', $book->uid)}}"
+                               class="sidemenu-link m-0 {{request()->routeIs('user.book.edit.outlines') ? 'active' :''}}">
+                                <div class="sidemenu-icon">
+                                    <i class="bi bi-list-columns-reverse"></i>
+                                </div>
                                 <span class="fs-12">{{translate("Outlines")}}</span>
                             </a>
                         </li>
                         <li class="sidemenu-item">
-                            <a href="{{route('user.ai.content.list')}}"
-                               class="sidemenu-link m-0 {{request()->routeIs('user.ai.content.*') ? 'active' :''}}">
+                            <a href="{{route('user.book.edit.cover', $book->uid)}}"
+                               class="sidemenu-link m-0 {{request()->routeIs('user.book.edit.cover') ? 'active' :''}}">
+                                <div class="sidemenu-icon">
+                                    <i class="bi bi-file-image"></i>
+                                </div>
                                 <span class="fs-12">{{translate("Cover")}}</span>
                             </a>
                         </li>
                         <li class="sidemenu-item">
-                            <a href="{{route('user.ai.content.list')}}"
-                               class="sidemenu-link m-0 {{request()->routeIs('user.ai.content.*') ? 'active' :''}}">
-                                <span><i class="bi bi-pencil-square"></i></span>
-                                <span class="fs-12">{{translate("Cover")}}</span>
+                            <a href="#"
+                               class="sidemenu-link m-0 sidemenu-collapse {{request()->routeIs('user.book.chapters.*') ? 'active' :''}}">
+                                <div class="sidemenu-icon">
+                                    <i class="bi bi-body-text"></i>
+                                </div>
+                                <span class="fs-12">{{translate("Chapters")}}
+                                     <small><i class="bi bi-chevron-down"></i></small>
+                                </span>
                             </a>
+                            <div
+                                class="side-menu-dropdown @if(request()->routeIs('user.book.edit.chapters.*')) show-sideMenu @endif">
+                                <ul class="sub-menu">
+
+                                    @foreach($book->chapters as $chapter)
+                                        <li class="sub-menu-item">
+                                            <a class="sidebar-menu-link {{request()->routeIs('user.book.edit.chapters', ['id' => $book->uid, 'chapter' => $chapter->uid]) ? 'active' :''}}"
+                                               href="{{route('user.book.edit.chapters',['id' => $book->uid, 'chapter' => $chapter->uid])}}">
+                                                <p>{{str_replace("Chapter ", "", $chapter->title)}}</p>
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
                         </li>
                         <li class="sidemenu-item">
-                            <a href="{{route('user.ai.content.list')}}"
-                               class="sidemenu-link m-0 {{request()->routeIs('user.ai.content.*') ? 'active' :''}}">
-                                <span class="fs-12">{{translate("Chapters")}}</span>
-                            </a>
-                        </li>
-                        <li class="sidemenu-item">
-                            <a href="{{route('user.ai.content.list')}}"
-                               class="sidemenu-link m-0 {{request()->routeIs('user.ai.content.*') ? 'active' :''}}">
+                            <a href="{{route('user.book.edit.audio', $book->uid)}}"
+                               class="sidemenu-link m-0 {{request()->routeIs('user.book.edit.audio') ? 'active' :''}}">
+                                <div class="sidemenu-icon">
+                                    <i class="bi bi-music-note-list"></i>
+                                </div>
                                 <span class="fs-12">{{translate("Audio Book")}}</span>
                             </a>
                         </li>
@@ -92,7 +116,7 @@
                 </div>
 
                 <div class="sidebar-footer">
-                    <a href="{{route('user.logout')}}"><span><i class="bi bi-box-arrow-right"></i></span>
+                    <a href="{{route('user.logout')}}"><span><i class="bi bi-gear"></i></span>
                         {{translate('Settings')}}
                     </a>
                 </div>

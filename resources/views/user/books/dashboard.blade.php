@@ -122,7 +122,7 @@
                                                                        class="btn btn-sm btn-info mx-1">
                                                                         <i class="bi bi-eye"></i>
                                                                     </a>
-                                                                    <a href="{{ route('user.book.manager.edit.detail', $book->uid) }}"
+                                                                    <a href="{{ route('user.book.edit.details', $book->uid) }}"
                                                                        class="btn btn-sm btn-warning mx-1">
                                                                         <i class="bi bi-pencil"></i>
                                                                     </a>
