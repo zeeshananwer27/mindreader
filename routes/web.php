@@ -333,6 +333,7 @@ Route::middleware($globalMiddleware)->group(function () {
     Route::prefix('book/')->name('book.')->group(function () {
         Route::get('/{uid}/landing', [FrontBookController::class, 'landing'])->name('landing');
         Route::get('/{uid}/view', [FrontBookController::class, 'view'])->name('view');
+        Route::get('/{uid}/preview', [FrontBookController::class, 'preview'])->name('preview');
     });
 
     Route::controller(FrontendController::class)->group(function () {
