@@ -79,6 +79,8 @@ class BookService
 
         $chaptersData = $this->getBookChapterAndOutlinesByAi($inputData);
         $chaptersArray = $chaptersData['message']['chapters'];
+
+        $book->chapters()->delete();
         $this->saveChaptersToDb($chaptersArray, $book);
 
         GenerateChapterDetailsJob::dispatch($book)->onQueue('default');

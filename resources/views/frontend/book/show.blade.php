@@ -1,12 +1,10 @@
 @extends('layouts.master')
 
 @section('content')
-
     @include("frontend.partials.breadcrumb")
 
     <div class="container mt-4">
         <div class="row g-4">
-
             <!-- Left Sidebar (3 columns) -->
             <div class="col-md-3 i-card-md border-end p-4">
                 <div class="sticky sticky-top">
@@ -77,7 +75,6 @@
                     </div>
                 @endforeach
             </div>
-
         </div>
     </div>
 @endsection
@@ -86,10 +83,8 @@
 @push('script-push')
     <script nonce="{{ csp_nonce() }}">
         $(document).ready(function () {
-            // Initialize Bootstrap tooltips
             $('[data-bs-toggle="tooltip"]').tooltip();
 
-            // Function to update the URL without reloading
             function updateURL(chapterUid, sectionUid = null) {
                 let newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?chapter=" + chapterUid;
                 if (sectionUid) {
@@ -98,7 +93,6 @@
                 window.history.pushState({ path: newUrl }, "", newUrl);
             }
 
-            // Function to load a specific chapter
             function loadChapter(uid) {
                 $(".chapter-content").removeClass('d-block').addClass('d-none');
                 $(".accordion-button").removeClass('active');
@@ -110,9 +104,8 @@
                 updateURL(uid);
             }
 
-            // Function to scroll to a specific section and highlight it
             function scrollToSection(sectionUid) {
-                $(".section-link").removeClass("text-primary fw-bold"); // Remove highlight from all sections
+                $(".section-link").removeClass("text-primary fw-bold");
 
                 let sectionElement = $("#section-" + sectionUid);
                 let sectionLink = $(".section-link[data-section='" + sectionUid + "']");
@@ -122,25 +115,25 @@
                         scrollTop: sectionElement.offset().top - 80
                     }, 500);
 
-                    sectionLink.addClass("text-primary fw-bold"); // Highlight active section
+                    sectionLink.addClass("text-primary fw-bold");
                 }
             }
 
-            // Handle chapter clicks (expand the chapter and show content)
-            $(".accordion-button").click(function () {
+            // Handle chapter clicks - Prevent duplicate binding
+            $(document).off("click", ".accordion-button").on("click", ".accordion-button", function () {
                 var targetUid = $(this).data("uid");
                 loadChapter(targetUid);
             });
 
-            // Handle section clicks (scroll to section inside the chapter and highlight it)
-            $(".section-link").click(function () {
+            // Handle section clicks - Prevent duplicate binding
+            $(document).off("click", ".section-link").on("click", ".section-link", function () {
                 var chapterUid = $(this).data("chapter");
                 var sectionUid = $(this).data("section");
 
                 loadChapter(chapterUid);
                 setTimeout(function () {
                     scrollToSection(sectionUid);
-                }, 300); // Give some time for content to load
+                }, 300);
 
                 updateURL(chapterUid, sectionUid);
             });
