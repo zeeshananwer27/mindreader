@@ -51,4 +51,22 @@ class BookController extends Controller
         ]);
     }
 
+    /**
+     * Show book details
+     *
+     * @param string $id
+     * @return View
+     */
+    public function preview(string $id): View
+    {
+        $book = Book::with(['chapters.topics', 'authorProfile'])
+            ->status('active')->where('uid',$id)->firstOrfail();
+
+        return view('frontend.book.preview', [
+            'meta_data'    => $this->metaData(["title" => $book->title]),
+            'book'         => $book,
+            'breadcrumbs'  => ['Home' => 'home', $book->title => null],
+        ]);
+    }
+
 }
