@@ -1,97 +1,184 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $meta_data['title'] }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.1/turn.min.css">
-    <style>
-        /* Custom styles for the flipbook */
-        #flipbook {
-            width: 800px;
-            height: 600px;
-            margin: 0 auto;
-        }
-        .page {
-            background-color: #f9f9f9;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .page h3 {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .page h4 {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        .page p {
-            font-size: 16px;
-            line-height: 1.6;
-        }
-        .page img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-    </style>
-</head>
-<body>
-<div class="container my-5">
-    <!-- Flipbook Container -->
-    <div id="flipbook">
-        @foreach($book->chapters as $chapter)
-            <div class="page">
-                <h3>{{ $chapter->title }}</h3>
-                @foreach($chapter->topics->sortBy('order') as $topic)
-                    <div>
-                        @if($topic->type === 'title')
-                            <h4>{{ $topic->content }}</h4>
-                        @elseif($topic->type === 'paragraph')
-                            <p>{!! nl2br(e($topic->content)) !!}</p>
-                        @elseif($topic->type === 'image')
-                            <img src="{{ asset('storage/' . $topic->content) }}" alt="Image">
-                        @endif
+@extends('layouts.master')
+
+@section('content')
+    @include("frontend.partials.breadcrumb")
+    <div class="container mt-4">
+        <div class="row g-4 d-flex justify-content-center">
+            <div class="flip-book html-book" id="book">
+                <div>
+                    <div class="page page-cover page-cover-top" data-density="hard">
+                        <div class="page-content">
+                            <h2>BOOK TITLE</h2>
+                        </div>
                     </div>
-                @endforeach
+                    <div class="page">
+                        <div class="page-content">
+                            <h2 class="page-header">Page header - 1</h2>
+                            <div class="page-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. In
+                                cursus mollis nibh, non convallis ex convallis eu. Suspendisse potenti. Aenean vitae
+                                pellentesque erat. Integer non tristique quam. Suspendisse rutrum, augue ac
+                                sollicitudin mollis, eros velit viverra metus, a venenatis tellus tellus id magna.
+                                Aliquam ac nulla rhoncus, accumsan eros sed, viverra enim. Pellentesque non justo
+                                vel nibh sollicitudin pharetra suscipit ut ipsum. Lorem ipsum dolor sit amet,
+                                consectetur adipiscing elit. In cursus mollis nibh, non convallis ex convallis eu.
+                                Suspendisse potenti. Aenean vitae pellentesque erat. Integer non tristique quam.
+                                Suspendisse rutrum, augue ac sollicitudin mollis, eros velit viverra metus, a
+                                venenatis tellus tellus id magna.
+                            </div>
+                            <div class="page-footer">1</div>
+                        </div>
+                    </div>
+                    <div class="page">
+                        <div class="page-content">
+                            <h2 class="page-header">Page header - 2</h2>
+                            <div class="page-image" style="background-image: url(images/html/2.jpg)"></div>
+                            <div class="page-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. In
+                                cursus mollis nibh, non convallis ex convallis eu. Suspendisse potenti. Aenean vitae
+                                pellentesque erat. Integer non tristique quam. Suspendisse rutrum, augue ac
+                                sollicitudin mollis, eros velit viverra metus, a venenatis tellus tellus id magna.
+                                Aliquam ac nulla rhoncus, accumsan eros sed, viverra enim. Pellentesque non justo
+                                vel nibh sollicitudin pharetra suscipit ut ipsum. Lorem ipsum dolor sit amet,
+                                consectetur adipiscing elit. In cursus mollis nibh, non convallis ex convallis eu.
+                                Suspendisse potenti. Aenean vitae pellentesque erat. Integer non tristique quam.
+                                Suspendisse rutrum, augue ac sollicitudin mollis, eros velit viverra metus, a
+                                venenatis tellus tellus id magna.
+                            </div>
+                            <div class="page-footer">2</div>
+                        </div>
+                    </div>
+                    <div class="page">
+                        <div class="page-content">
+                            <h2 class="page-header">Page header - 3</h2>
+                            <div class="page-image" style="background-image: url(images/html/3.jpg)"></div>
+                            <div class="page-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. In
+                                cursus mollis nibh, non convallis ex convallis eu. Suspendisse potenti. Aenean vitae
+                                pellentesque erat. Integer non tristique quam. Suspendisse rutrum, augue ac
+                                sollicitudin mollis, eros velit viverra metus, a venenatis tellus tellus id magna.
+                                Aliquam ac nulla rhoncus, accumsan eros sed, viverra enim. Pellentesque non justo
+                                vel nibh sollicitudin pharetra suscipit ut ipsum. Lorem ipsum dolor sit amet,
+                                consectetur adipiscing elit. In cursus mollis nibh, non convallis ex convallis eu.
+                                Suspendisse potenti. Aenean vitae pellentesque erat. Integer non tristique quam.
+                                Suspendisse rutrum, augue ac sollicitudin mollis, eros velit viverra metus, a
+                                venenatis tellus tellus id magna.
+                            </div>
+                            <div class="page-footer">3</div>
+                        </div>
+                    </div>
+                    <div class="page">
+                        <div class="page-content">
+                            <h2 class="page-header">HARD Page header - 4</h2>
+                            <div class="page-image" style="background-image: url(images/html/4.jpg)"></div>
+                            <div class="page-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. In
+                                cursus mollis nibh, non convallis ex convallis eu. Suspendisse potenti. Aenean vitae
+                                pellentesque erat. Integer non tristique quam. Suspendisse rutrum, augue ac
+                                sollicitudin mollis, eros velit viverra metus, a venenatis tellus tellus id magna.
+                                Aliquam ac nulla rhoncus, accumsan eros sed, viverra enim. Pellentesque non justo
+                                vel nibh sollicitudin pharetra suscipit ut ipsum. Lorem ipsum dolor sit amet,
+                                consectetur adipiscing elit. In cursus mollis nibh, non convallis ex convallis eu.
+                                Suspendisse potenti. Aenean vitae pellentesque erat. Integer non tristique quam.
+                                Suspendisse rutrum, augue ac sollicitudin mollis, eros velit viverra metus, a
+                                venenatis tellus tellus id magna.
+                            </div>
+                            <div class="page-footer">4</div>
+                        </div>
+                    </div>
+                    <div class="page">
+                        <div class="page-content">
+                            <h2 class="page-header">HARD Page header - 5</h2>
+                            <div class="page-image" style="background-image: url(images/html/5.jpg)"></div>
+                            <div class="page-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. In
+                                cursus mollis nibh, non convallis ex convallis eu. Suspendisse potenti. Aenean vitae
+                                pellentesque erat. Integer non tristique quam. Suspendisse rutrum, augue ac
+                                sollicitudin mollis, eros velit viverra metus, a venenatis tellus tellus id magna.
+                                Aliquam ac nulla rhoncus, accumsan eros sed, viverra enim. Pellentesque non justo
+                                vel nibh sollicitudin pharetra suscipit ut ipsum. Lorem ipsum dolor sit amet,
+                                consectetur adipiscing elit. In cursus mollis nibh, non convallis ex convallis eu.
+                                Suspendisse potenti. Aenean vitae pellentesque erat. Integer non tristique quam.
+                                Suspendisse rutrum, augue ac sollicitudin mollis, eros velit viverra metus, a
+                                venenatis tellus tellus id magna.
+                            </div>
+                            <div class="page-footer">5</div>
+                        </div>
+                    </div>
+                    <div class="page">
+                        <div class="page-content">
+                            <h2 class="page-header">Page header - 6</h2>
+                            <div class="page-image" style="background-image: url(images/html/6.jpg)"></div>
+                            <div class="page-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. In
+                                cursus mollis nibh, non convallis ex convallis eu. Suspendisse potenti. Aenean vitae
+                                pellentesque erat. Integer non tristique quam. Suspendisse rutrum, augue ac
+                                sollicitudin mollis, eros velit viverra metus, a venenatis tellus tellus id magna.
+                                Aliquam ac nulla rhoncus, accumsan eros sed, viverra enim. Pellentesque non justo
+                                vel nibh sollicitudin pharetra suscipit ut ipsum. Lorem ipsum dolor sit amet,
+                                consectetur adipiscing elit. In cursus mollis nibh, non convallis ex convallis eu.
+                                Suspendisse potenti. Aenean vitae pellentesque erat. Integer non tristique quam.
+                                Suspendisse rutrum, augue ac sollicitudin mollis, eros velit viverra metus, a
+                                venenatis tellus tellus id magna.
+                            </div>
+                            <div class="page-footer">6</div>
+                        </div>
+                    </div>
+                    <div class="page">
+                        <div class="page-content">
+                            <h2 class="page-header">Page header - 7</h2>
+                            <div class="page-image" style="background-image: url(images/html/7.jpg)"></div>
+                            <div class="page-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. In
+                                cursus mollis nibh, non convallis ex convallis eu. Suspendisse potenti. Aenean vitae
+                                pellentesque erat. Integer non tristique quam. Suspendisse rutrum, augue ac
+                                sollicitudin mollis, eros velit viverra metus, a venenatis tellus tellus id magna.
+                                Aliquam ac nulla rhoncus, accumsan eros sed, viverra enim. Pellentesque non justo
+                                vel nibh sollicitudin pharetra suscipit ut ipsum. Lorem ipsum dolor sit amet,
+                                consectetur adipiscing elit. In cursus mollis nibh, non convallis ex convallis eu.
+                                Suspendisse potenti. Aenean vitae pellentesque erat. Integer non tristique quam.
+                                Suspendisse rutrum, augue ac sollicitudin mollis, eros velit viverra metus, a
+                                venenatis tellus tellus id magna.
+                            </div>
+                            <div class="page-footer">7</div>
+                        </div>
+                    </div>
+                    <div class="page">
+                        <div class="page-content">
+                            <h2 class="page-header">Page header - 8</h2>
+                            <div class="page-image" style="background-image: url(images/html/8.jpg)"></div>
+                            <div class="page-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. In
+                                cursus mollis nibh, non convallis ex convallis eu. Suspendisse potenti. Aenean vitae
+                                pellentesque erat. Integer non tristique quam. Suspendisse rutrum, augue ac
+                                sollicitudin mollis, eros velit viverra metus, a venenatis tellus tellus id magna.
+                                Aliquam ac nulla rhoncus, accumsan eros sed, viverra enim. Pellentesque non justo
+                                vel nibh sollicitudin pharetra suscipit ut ipsum. Lorem ipsum dolor sit amet,
+                                consectetur adipiscing elit. In cursus mollis nibh, non convallis ex convallis eu.
+                                Suspendisse potenti. Aenean vitae pellentesque erat. Integer non tristique quam.
+                                Suspendisse rutrum, augue ac sollicitudin mollis, eros velit viverra metus, a
+                                venenatis tellus tellus id magna.
+                            </div>
+                            <div class="page-footer">8</div>
+                        </div>
+                    </div>
+                    <div class="page page-cover page-cover-bottom" data-density="hard">
+                        <div class="page-content">
+                            <h2>THE END</h2>
+                        </div>
+                    </div>
+                </div>
             </div>
-        @endforeach
+        </div>
     </div>
+@endsection
 
-    <!-- Navigation Buttons -->
-    <div class="text-center mt-4">
-        <button id="prev" class="btn btn-primary">Previous</button>
-        <button id="next" class="btn btn-primary">Next</button>
-    </div>
-</div>
+<!-- jQuery and Bootstrap Script -->
+@push('script-push')
 
-<!-- Scripts -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.1/turn.min.js"></script>
-<script>
-    $(document).ready(function () {
-        // Initialize the flipbook
-        $('#flipbook').turn({
-            width: 800,
-            height: 600,
-            autoCenter: true,
-            acceleration: true,
-            gradients: true,
+    <script nonce="{{ csp_nonce() }}">
+        $(document).ready(function () {
+            const pageFlip = new St.PageFlip(document.getElementById('book'),
+                {
+                    width: 400,
+                    height: 500,
+                    showCover: true
+                }
+            );
+            pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+
         });
-
-        // Navigation buttons
-        $('#prev').click(function() {
-            $('#flipbook').turn('previous');
-        });
-
-        $('#next').click(function() {
-            $('#flipbook').turn('next');
-        });
-    });
-</script>
-</body>
-</html>
+    </script>
+@endpush
