@@ -6,6 +6,15 @@
                                         ->get();
 
 @endphp
+
+<?php 
+
+// echo "<pre>"; print_r($content); exit(' vii'); 
+
+
+
+?>
+
 <section class="pricing-plan pb-110">
   <div class="container">
   

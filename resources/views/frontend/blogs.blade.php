@@ -1,6 +1,11 @@
 @extends('layouts.theme1')
 @section('content')
 
+@php
+      $blogContent  = get_content("content_blog")->first();
+  @endphp
+
+
       <!-- BLOG POSTS LISTING
       ============================================= -->
       <section id="blog-page" class="pb-40 inner-page-hero blog-page-section division">
@@ -11,42 +16,23 @@
           <div class="blog-post wide-post wow animate__animated animate__fadeInUp">
             <div class="row d-flex align-items-center">
 
-
-              <!-- BLOG POST IMAGE -->
-              <div class="col-md-6">
-                <div class="blog-post-img r-12">
-                  <img class="img-fluid" src="{{ asset('assets/theme1/images/img-10.jpg') }}" alt="blog-post-image">
-                </div>  
-              </div>
-
-
               <!-- BLOG POST TEXT -->
-              <div class="col-md-6">
+
+
+              <div class="col-md-12">
                 <div class="blog-post-txt">
 
                   <!-- Post Tag -->
-                  <span class="post-tag color--theme">Tutorials</span>  
+                  <div class="subtitle"></div>
+                  <span class="post-tag color--theme">{{@$blogContent->value->sub_title}}</span>  
 
                   <!-- Post Link -->
                   <h4 class="h4-xl">
-                    <a href="single-post.html">Posuere tempor aliquet and Pintex sapien turpis laoreet augue
-                       posuere
+                    <a href="single-post.html">@php echo (@$blogContent->value->title) @endphp
                     </a>
                   </h4>
-
                   <!-- Text -->
-                  <p>Aliqum mullam blandit vitae tempor in sapien and donec lipsum gravida porta augue velna 
-                     dolor libero an aliquet risus tempus a tempor posuere velna tempus posuere
-                  </p>
-
-                  <!-- Post Meta -->
-                  <div class="blog-post-meta">
-                    <ul class="post-meta-list ico-10">
-                      <li><p>July 31, 2024</p></li>
-                      <li class="meta-list-divider"><p><span class="flaticon-minus-1"></span></p></li>
-                      <li><p>8 min read</p></li>
-                    </ul>
-                  </div>
+                  <p>{{@$blogContent->value->description}}</p>
 
                 </div>
               </div>  <!-- END BLOG POST TEXT -->
@@ -69,7 +55,7 @@
           <!-- POSTS WRAPPER -->
           <div class="posts-wrapper">
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
-
+              @forelse ($blogs as $blog)
 
               <!-- BLOG POST #1 -->
               <div class="col">
@@ -77,7 +63,8 @@
 
                   <!-- BLOG POST IMAGE -->
                   <div class="blog-post-img r-12">
-                    <img class="img-fluid" src="{{ asset('assets/theme1/images/img-01.jpg') }}" alt="blog-post-image">
+                    <img class="img-fluid" src='{{imageURL(@$blog->file,"blog",true)}}'
+                                  alt="{{@$blog->file->name ?? 'blog-image.jpg'}}"/>
                   </div>
 
                   <!-- BLOG POST TEXT -->
@@ -87,336 +74,27 @@
                     <span class="post-tag color--theme">Tutorials</span>  
 
                     <!-- Post Link -->
-                    <h5>
-                      <a href="single-post.html">Integer posuere AI donec ipsum a porta justo auctor</a>
-                    </h5>
+                    <h6 class="h6-xl">{{$blog->title}}</h6>
 
                     <!-- Short Description -->
-                    <p>Sagittis congue augue egestas a velna integer purus filis magna suscipit...</p>
+                    <p>{{$blog->description}}</p>
 
-                    <!-- Post Meta -->
-                    <div class="blog-post-meta">
-                      <ul class="post-meta-list ico-10">
-                        <li><p class="p-sm">July 25, 2024</p></li>
-                        <li class="meta-list-divider"><p><span class="flaticon-minus-1"></span></p></li>
-                        <li><p class="p-sm">8 min read</p></li>
-                      </ul>
-                    </div>  
+  
 
                   </div>  <!-- END BLOG POST TEXT -->
 
                 </div>
               </div>  <!-- END  BLOG POST #1 -->
 
+              @empty
 
-              <!-- BLOG POST #2 -->
-              <div class="col">
-                <div class="blog-post wow animate__animated animate__fadeInUp">
+            @endforelse
 
-                  <!-- BLOG POST IMAGE -->
-                  <div class="blog-post-img r-12">
-                    <img class="img-fluid" src="{{ asset('assets/theme1/images/img-02.jpg') }}" alt="blog-post-image">
-                  </div>
 
-                  <!-- BLOG POST TEXT -->
-                  <div class="blog-post-txt">
+             
 
-                    <!-- Post Tag -->
-                    <span class="post-tag color--theme">Pintex News</span>  
 
-                    <!-- Post Link -->
-                    <h5>
-                      <a href="single-post.html">A ligula risus diam auctor</a>
-                    </h5>
 
-                    <!-- Short Description -->
-                    <p>Congue sagittis augue egestas velna integer and purus filis suscipit magna felis turpis 
-                       and blandit augue mauris..
-                    </p>
-
-                    <!-- Post Meta -->
-                    <div class="blog-post-meta">
-                      <ul class="post-meta-list ico-10">
-                        <li><p class="p-sm">July 19, 2024</p></li>
-                        <li class="meta-list-divider"><p><span class="flaticon-minus-1"></span></p></li>
-                        <li><p class="p-sm">5 min read</p></li>
-                      </ul>
-                    </div>  
-
-                  </div>  <!-- END BLOG POST TEXT -->
-
-                </div>
-              </div>  <!-- END  BLOG POST #2 -->
-
-
-              <!-- BLOG POST #3 -->
-              <div class="col">
-                <div class="blog-post wow animate__animated animate__fadeInUp">
-
-                  <!-- BLOG POST IMAGE -->
-                  <div class="blog-post-img r-12">
-                    <img class="img-fluid" src="{{ asset('assets/theme1/images/img-03.jpg') }}" alt="blog-post-image">
-                  </div>
-
-                  <!-- BLOG POST TEXT -->
-                  <div class="blog-post-txt">
-
-                    <!-- Post Tag -->
-                    <span class="post-tag color--theme">Insights</span> 
-
-                    <!-- Post Link -->
-                    <h5>
-                      <a href="single-post.html">Donec sapien augue and integer turpis cursus</a>
-                    </h5>
-
-                    <!-- Short Description -->
-                    <p>Congue sagittis augue egestas a velna integer purus filis suscipit magna...</p>
-
-                    <!-- Post Meta -->
-                    <div class="blog-post-meta">
-                      <ul class="post-meta-list ico-10">
-                        <li><p class="p-sm">July 02, 2024</p></li>
-                        <li class="meta-list-divider"><p><span class="flaticon-minus-1"></span></p></li>
-                        <li><p class="p-sm">6 min read</p></li>
-                      </ul>
-                    </div>  
-
-                  </div>  <!-- END BLOG POST TEXT -->
-
-                </div>
-              </div>  <!-- END  BLOG POST #3 -->
-
-
-              <!-- BLOG POST #4 -->
-              <div class="col">
-                <div class="blog-post wow animate__animated animate__fadeInUp">
-
-                  <!-- BLOG POST IMAGE -->
-                  <div class="blog-post-img r-12">
-                    <img class="img-fluid" src="{{ asset('assets/theme1/images/img-04.jpg') }}" alt="blog-post-image">
-                  </div>
-
-                  <!-- BLOG POST TEXT -->
-                  <div class="blog-post-txt">
-
-                    <!-- Post Tag -->
-                    <span class="post-tag color--theme">Pintex News</span>  
-
-                    <!-- Post Link -->
-                    <h5>
-                      <a href="single-post.html">Risus ociis integer auctor</a>
-                    </h5>
-
-                    <!-- Short Description -->
-                    <p>Congue sagittis augue egestas velna integer and purus filis suscipit magna felis turpis 
-                       and blandit augue mauris..
-                    </p>
-
-                    <!-- Post Meta -->
-                    <div class="blog-post-meta">
-                      <ul class="post-meta-list ico-10">
-                        <li><p class="p-sm">June 26, 2024</p></li>
-                        <li class="meta-list-divider"><p><span class="flaticon-minus-1"></span></p></li>
-                        <li><p class="p-sm">8 min read</p></li>
-                      </ul>
-                    </div>  
-
-                  </div>  <!-- END BLOG POST TEXT -->
-
-                </div>
-              </div>  <!-- END  BLOG POST #4 -->
-
-
-              <!-- BLOG POST #5 -->
-              <div class="col">
-                <div class="blog-post wow animate__animated animate__fadeInUp">
-
-                  <!-- BLOG POST IMAGE -->
-                  <div class="blog-post-img r-12">
-                    <img class="img-fluid" src="{{ asset('assets/theme1/images/img-05.jpg') }}" alt="blog-post-image">
-                  </div>
-
-                  <!-- BLOG POST TEXT -->
-                  <div class="blog-post-txt">
-
-                    <!-- Post Tag -->
-                    <span class="post-tag color--theme">Guides</span> 
-
-                    <!-- Post Link -->
-                    <h5>
-                      <a href="single-post.html">Sagittis sapien augue undo integer turpis cursus</a>
-                    </h5>
-
-                    <!-- Short Description -->
-                    <p>Congue sagittis augue egestas a velna integer purus filis suscipit magna...</p>
-
-                    <!-- Post Meta -->
-                    <div class="blog-post-meta">
-                      <ul class="post-meta-list ico-10">
-                        <li><p class="p-sm">June 11, 2024</p></li>
-                        <li class="meta-list-divider"><p><span class="flaticon-minus-1"></span></p></li>
-                        <li><p class="p-sm">7 min read</p></li>
-                      </ul>
-                    </div>  
-
-                  </div>  <!-- END BLOG POST TEXT -->
-
-                </div>
-              </div>  <!-- END  BLOG POST #5 -->
-
-
-              <!-- BLOG POST #6 -->
-              <div class="col">
-                <div class="blog-post wow animate__animated animate__fadeInUp">
-
-                  <!-- BLOG POST IMAGE -->
-                  <div class="blog-post-img r-12">
-                    <img class="img-fluid" src="{{ asset('assets/theme1/images/img-06.jpg') }}" alt="blog-post-image">
-                  </div>
-
-                  <!-- BLOG POST TEXT -->
-                  <div class="blog-post-txt">
-
-                    <!-- Post Tag -->
-                    <span class="post-tag color--theme">Pintex News</span>  
-
-                    <!-- Post Link -->
-                    <h5>
-                      <a href="single-post.html">Turpis integer urna donec ipsum a porta auctor justo</a>
-                    </h5>
-
-                    <!-- Short Description -->
-                    <p>Sagittis congue augue egestas a velna integer purus filis magna suscipit...</p>
-
-                    <!-- Post Meta -->
-                    <div class="blog-post-meta">
-                      <ul class="post-meta-list ico-10">
-                        <li><p class="p-sm">June 04, 2024</p></li>
-                        <li class="meta-list-divider"><p><span class="flaticon-minus-1"></span></p></li>
-                        <li><p class="p-sm">10 min read</p></li>
-                      </ul>
-                    </div>  
-
-                  </div>  <!-- END BLOG POST TEXT -->
-
-                </div>
-              </div>  <!-- END  BLOG POST #6 -->
-
-
-              <!-- BLOG POST #7 -->
-              <div class="col">
-                <div class="blog-post wow animate__animated animate__fadeInUp">
-
-                  <!-- BLOG POST IMAGE -->
-                  <div class="blog-post-img r-12">
-                    <img class="img-fluid" src="{{ asset('assets/theme1/images/img-07.jpg') }}" alt="blog-post-image">
-                  </div>
-
-                  <!-- BLOG POST TEXT -->
-                  <div class="blog-post-txt">
-
-                    <!-- Post Tag -->
-                    <span class="post-tag color--theme">Guides</span> 
-
-                    <!-- Post Link -->
-                    <h5>
-                      <a href="single-post.html">Donec sapien augue and integer turpis cursus</a>
-                    </h5>
-
-                    <!-- Short Description -->
-                    <p>Congue sagittis augue egestas a velna integer purus filis suscipit magna...</p>
-
-                    <!-- Post Meta -->
-                    <div class="blog-post-meta">
-                      <ul class="post-meta-list ico-10">
-                        <li><p class="p-sm">May 25, 2024</p></li>
-                        <li class="meta-list-divider"><p><span class="flaticon-minus-1"></span></p></li>
-                        <li><p class="p-sm">9 min read</p></li>
-                      </ul>
-                    </div>  
-
-                  </div>  <!-- END BLOG POST TEXT -->
-
-                </div>
-              </div>  <!-- END  BLOG POST #7 -->
-
-
-              <!-- BLOG POST #8 -->
-              <div class="col">
-                <div class="blog-post wow animate__animated animate__fadeInUp">
-
-                  <!-- BLOG POST IMAGE -->
-                  <div class="blog-post-img r-12">
-                    <img class="img-fluid" src="{{ asset('assets/theme1/images/img-08.jpg') }}" alt="blog-post-image">
-                  </div>
-
-                  <!-- BLOG POST TEXT -->
-                  <div class="blog-post-txt">
-
-                    <!-- Post Tag -->
-                    <span class="post-tag color--theme">Insights</span> 
-
-                    <!-- Post Link -->
-                    <h5>
-                      <a href="single-post.html">Augue sapien sagittis diam integer turpis cursus purus 
-                         and filis suscipit magna
-                      </a>
-                    </h5>
-
-                    <!-- Short Description -->
-                    <p>Congue sagittis augue egestas a velna integer purus filis suscipit magna...</p>
-
-                    <!-- Post Meta -->
-                    <div class="blog-post-meta">
-                      <ul class="post-meta-list ico-10">
-                        <li><p class="p-sm">May 20, 2024</p></li>
-                        <li class="meta-list-divider"><p><span class="flaticon-minus-1"></span></p></li>
-                        <li><p class="p-sm">5 min read</p></li>
-                      </ul>
-                    </div>  
-
-                  </div>  <!-- END BLOG POST TEXT -->
-
-                </div>
-              </div>  <!-- END  BLOG POST #8 -->
-
-
-              <!-- BLOG POST #9 -->
-              <div class="col">
-                <div class="blog-post wow animate__animated animate__fadeInUp">
-
-                  <!-- BLOG POST IMAGE -->
-                  <div class="blog-post-img r-12">
-                    <img class="img-fluid" src="{{ asset('assets/theme1/images/img-09.jpg') }}" alt="blog-post-image">
-                  </div>
-
-                  <!-- BLOG POST TEXT -->
-                  <div class="blog-post-txt">
-
-                    <!-- Post Tag -->
-                    <span class="post-tag color--theme">Tutorials</span>  
-
-                    <!-- Post Link -->
-                    <h5>
-                      <a href="single-post.html">Integer posuere AI donec ipsum a porta justo auctor</a>
-                    </h5>
-
-                    <!-- Short Description -->
-                    <p>Sagittis congue augue egestas a velna integer purus filis magna suscipit...</p>
-
-                    <!-- Post Meta -->
-                    <div class="blog-post-meta">
-                      <ul class="post-meta-list ico-10">
-                        <li><p class="p-sm">May 18, 2024</p></li>
-                        <li class="meta-list-divider"><p><span class="flaticon-minus-1"></span></p></li>
-                        <li><p class="p-sm">8 min read</p></li>
-                      </ul>
-                    </div>  
-
-                  </div>  <!-- END BLOG POST TEXT -->
-
-                </div>
-              </div>  <!-- END  BLOG POST #9 -->
 
 
             </div>  <!-- End row -->
@@ -437,12 +115,7 @@
             <div class="col-md-12">
               <nav aria-label="Page navigation">
                 <ul class="pagination ico-20 justify-content-center">
-                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1"><span class="flaticon-back"></span></a>
-                    </li>
-                    <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#" aria-label="Next"><span class="flaticon-next"></span></a></li>
+                    {{$blogs->links() }}
                 </ul>
               </nav>
             </div>

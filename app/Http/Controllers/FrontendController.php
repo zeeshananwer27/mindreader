@@ -77,7 +77,7 @@ class FrontendController extends Controller
 
             'blogs'        => Blog::search(['title'])
                                             ->filter(['category:slug'])
-                                            ->paginate(paginateNumber())
+                                            ->paginate(2)
                                             ->appends(request()->all()),
 
             'menu'         => $menu ,

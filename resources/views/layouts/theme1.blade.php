@@ -1,3 +1,7 @@
+
+
+
+
 <!DOCTYPE html>
 <html lang="{{ App::getLocale() }}" class="sr">
 
@@ -195,299 +199,20 @@
         </header> <!-- END HEADER -->
 
        
+        	@yield('content')
 
+    @if(request()->routeIs('home'))
 
 
-			<!-- HERO
-			============================================= -->	
-			@yield('content')
+			@include('frontend.sections.theme1.banner')
 
-			<section id="hero-9" class="bg--fixed hero-section division">
-				<div class="container">	
-					<div class="row d-flex align-items-center">
+			@include('frontend.sections.theme1.about')
 
 
-						<!-- HERO TEXT -->
-						<div class="col-md-6">
-							<div class="hero-9-txt wow animate__animated animate__fadeInRight">
+			<!-- DIVIDER LINE -->
+			<hr class="divider">
 
-								<!-- Title -->
-								<h2>Expand your creative skills with Pintex</h2>
-
-								<!-- Text -->
-								<p class="p-lg">Feugiat primis ligula sapien and mauris auctor ipsum laoreet and pretium augue 
-									egestas cubilia cursus
-								</p>
-
-								<!-- STORE BADGES -->												
-								<div class="stores-badge badge-img-md">
-
-									<!-- AppStore -->
-									<a href="#" class="store">
-										<img class="appstore" src="{{ asset('assets/theme1/images/store_badges/appstore.png') }}" alt="appstore-badge">
-									</a>
-													
-									<!-- Google Play -->
-									<a href="#" class="store">
-										<img class="googleplay" src="{{ asset('assets/theme1/images/store_badges/googleplay.png') }}" alt="googleplay-badge">
-									</a> 
-							
-								</div>	<!-- END STORE BADGES -->	
-
-								<!-- OS Prerequisite -->
-								<div class="os-version-ext">
-									<div class="star-rating clearfix ico-10">
-										<span class="flaticon-star color--yellow"></span>
-										<span class="flaticon-star color--yellow"></span>
-										<span class="flaticon-star color--yellow"></span>
-										<span class="flaticon-star color--yellow"></span>
-										<span class="flaticon-star-half-empty color--yellow"></span>	
-										<small>4,78K+ Pintex users reviews.</small>
-									</div>		
-								</div>
-
-							</div>
-						</div>	<!-- END HERO TEXT -->	
-
-
-						<!-- HERO IMAGE -->
-						<div class="col-md-6">	
-							<div class="hero-9-img wow animate__animated animate__fadeInLeft">				
-								<img class="img-fluid" src="{{ asset('assets/theme1/images/img-02d.png') }}" alt="hero-image">						
-							</div>
-						</div>
-
-
-					</div>    <!-- End row --> 	
-				</div>	   <!-- End container --> 
-			</section>	
-
-			<!-- END HERO -->
-
-
-
-
-			<!-- FEATURES
-			============================================= -->
-			<section id="features" class="py-100 features-2 features-section division">
-				<div class="container">
-
-
-					<!-- SECTION TITLE -->	
-					<div class="row justify-content-center">	
-						<div class="col-md-9 col-lg-8">
-							<div class="section-title text-center mb-80">	
-
-								<!-- Title -->	
-								<h2 class="h2-xl">Ready to Try Pintex?</h2>	
-
-								<!-- Text -->
-								<p class="p-lg">Ligula risus auctor tempus magna feugiat lacinia laoreet luctus</p>
-									
-							</div>	
-						</div>
-					</div>
-
-
-					<!-- FEATURES WRAPPER -->
-					<div class="fbox-wrapper">
-						<div class="row row-cols-1 row-cols-md-2 rows-2">
-
-
-							<!-- FEATURE BOX #1 -->
-		 					<div class="col">
-		 						<div class="fbox-2 fb-1 wow animate__animated animate__fadeInUp animate__delay-1">
-
-		 							<!-- Icon -->
-									<div class="fbox-ico-wrap ico-55">
-										<div class="shape-ico color--theme-2">
-
-											<!-- Vector Icon -->
-											<span class="flaticon-cube"></span>
-
-											<!-- Shape -->
-											<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-											  <path d="M66.1,-32.6C77.9,-17.7,74.4,11.6,60.8,35.7C47.2,59.7,23.6,78.5,2.8,76.9C-18,75.2,-35.9,53.2,-47.7,30.1C-59.5,7.1,-65.1,-16.9,-56.1,-30.1C-47.1,-43.4,-23.6,-46,1.8,-47C27.2,-48.1,54.3,-47.6,66.1,-32.6Z" transform="translate(100 100)" />
-											</svg>
-
-										</div>
-									</div>	<!-- End Icon -->
-
-									<!-- Text -->
-									<div class="fbox-txt">
-										<h5>Exclusive AI Effects</h5>
-										<p>Porta semper lacus cursus feugiat a primis ligula ultrice risus an auctor tempus feugiat
-										   diam turpis impedit auctor felis and augue mauris blandit
-										</p>
-									</div>
-
-		 						</div>
-		 					</div>	<!-- END FEATURE BOX #1 -->	
-
-
-		 					<!-- FEATURE BOX #2 -->
-		 					<div class="col">
-		 						<div class="fbox-2 fb-2 wow animate__animated animate__fadeInUp animate__delay-2">
-
-		 							<!-- Icon -->
-									<div class="fbox-ico-wrap ico-55">
-										<div class="shape-ico color--theme-2">
-
-											<!-- Vector Icon -->
-											<span class="flaticon-push-pin"></span>
-
-											<!-- Shape -->
-											<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-											  <path d="M66.1,-32.6C77.9,-17.7,74.4,11.6,60.8,35.7C47.2,59.7,23.6,78.5,2.8,76.9C-18,75.2,-35.9,53.2,-47.7,30.1C-59.5,7.1,-65.1,-16.9,-56.1,-30.1C-47.1,-43.4,-23.6,-46,1.8,-47C27.2,-48.1,54.3,-47.6,66.1,-32.6Z" transform="translate(100 100)" />
-											</svg>
-
-										</div>
-									</div>	<!-- End Icon -->
-
-									<!-- Text -->
-									<div class="fbox-txt">
-										<h5>Animated Stickers & Text</h5>
-										<p>Porta semper lacus cursus feugiat a primis ligula ultrice risus an auctor tempus feugiat
-										   diam turpis impedit auctor felis and augue mauris blandit
-										</p>
-									</div>
-
-		 						</div>
-		 					</div>	<!-- END FEATURE BOX #2 -->	
-
-
-		 					<!-- FEATURE BOX #3 -->
-		 					<div class="col">
-		 						<div class="fbox-2 fb-3 wow animate__animated animate__fadeInUp animate__delay-1">
-
-		 							<!-- Icon -->
-									<div class="fbox-ico-wrap ico-55">
-										<div class="shape-ico color--theme-2">
-
-											<!-- Vector Icon -->
-											<span class="flaticon-audio-message"></span>
-
-											<!-- Shape -->
-											<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-											  <path d="M66.1,-32.6C77.9,-17.7,74.4,11.6,60.8,35.7C47.2,59.7,23.6,78.5,2.8,76.9C-18,75.2,-35.9,53.2,-47.7,30.1C-59.5,7.1,-65.1,-16.9,-56.1,-30.1C-47.1,-43.4,-23.6,-46,1.8,-47C27.2,-48.1,54.3,-47.6,66.1,-32.6Z" transform="translate(100 100)" />
-											</svg>
-
-										</div>
-									</div>	<!-- End Icon -->
-
-									<!-- Text -->
-									<div class="fbox-txt">
-										<h5>Sound & Music Effects</h5>
-										<p>Porta semper lacus cursus feugiat a primis ligula ultrice risus an auctor tempus feugiat
-										   diam turpis impedit auctor felis and augue mauris blandit
-										</p>
-									</div>
-
-		 						</div>
-		 					</div>	<!-- END FEATURE BOX #3 -->	
-
-
-		 					<!-- FEATURE BOX #4 -->
-		 					<div class="col">
-		 						<div class="fbox-2 fb-4 wow animate__animated animate__fadeInUp animate__delay-2">
-
-		 							<!-- Icon -->
-									<div class="fbox-ico-wrap ico-55">
-										<div class="shape-ico color--theme-2">
-
-											<!-- Vector Icon -->
-											<span class="flaticon-union"></span>
-
-											<!-- Shape -->
-											<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-											  <path d="M66.1,-32.6C77.9,-17.7,74.4,11.6,60.8,35.7C47.2,59.7,23.6,78.5,2.8,76.9C-18,75.2,-35.9,53.2,-47.7,30.1C-59.5,7.1,-65.1,-16.9,-56.1,-30.1C-47.1,-43.4,-23.6,-46,1.8,-47C27.2,-48.1,54.3,-47.6,66.1,-32.6Z" transform="translate(100 100)" />
-											</svg>
-
-										</div>
-									</div>	<!-- End Icon -->
-
-									<!-- Text -->
-									<div class="fbox-txt">
-										<h5>Trendy & Unique Filters</h5>
-										<p>Porta semper lacus cursus feugiat a primis ligula ultrice risus an auctor tempus feugiat
-										   diam turpis impedit auctor felis and augue mauris blandit
-										</p>
-									</div>
-
-		 						</div>
-		 					</div>	<!-- END FEATURE BOX #4 -->	
-
-
-		 					<!-- FEATURE BOX #5 -->
-		 					<div class="col">
-		 						<div class="fbox-2 fb-5 wow animate__animated animate__fadeInUp animate__delay-1">
-
-		 							<!-- Icon -->
-									<div class="fbox-ico-wrap ico-55">
-										<div class="shape-ico color--theme-2">
-
-											<!-- Vector Icon -->
-											<span class="flaticon-typography"></span>
-
-											<!-- Shape -->
-											<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-											  <path d="M66.1,-32.6C77.9,-17.7,74.4,11.6,60.8,35.7C47.2,59.7,23.6,78.5,2.8,76.9C-18,75.2,-35.9,53.2,-47.7,30.1C-59.5,7.1,-65.1,-16.9,-56.1,-30.1C-47.1,-43.4,-23.6,-46,1.8,-47C27.2,-48.1,54.3,-47.6,66.1,-32.6Z" transform="translate(100 100)" />
-											</svg>
-
-										</div>
-									</div>	<!-- End Icon -->
-
-									<!-- Text -->
-									<div class="fbox-txt">
-										<h5>Amazing Font Collection</h5>
-										<p>Porta semper lacus cursus feugiat a primis ligula ultrice risus an auctor tempus feugiat
-										   diam turpis impedit auctor felis and augue mauris blandit
-										</p>
-									</div>
-
-		 						</div>
-		 					</div>	<!-- END FEATURE BOX #5 -->	
-
-
-		 					<!-- FEATURE BOX #6 -->
-		 					<div class="col">
-		 						<div class="fbox-2 fb-6 wow animate__animated animate__fadeInUp animate__delay-2">
-
-		 							<!-- Icon -->
-									<div class="fbox-ico-wrap ico-55">
-										<div class="shape-ico color--theme-2">
-
-											<!-- Vector Icon -->
-											<span class="flaticon-search-engine-1"></span>
-
-											<!-- Shape -->
-											<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-											  <path d="M66.1,-32.6C77.9,-17.7,74.4,11.6,60.8,35.7C47.2,59.7,23.6,78.5,2.8,76.9C-18,75.2,-35.9,53.2,-47.7,30.1C-59.5,7.1,-65.1,-16.9,-56.1,-30.1C-47.1,-43.4,-23.6,-46,1.8,-47C27.2,-48.1,54.3,-47.6,66.1,-32.6Z" transform="translate(100 100)" />
-											</svg>
-
-										</div>
-									</div>	<!-- End Icon -->
-
-									<!-- Text -->
-									<div class="fbox-txt">
-										<h5>Access Stock Footage</h5>
-										<p>Porta semper lacus cursus feugiat a primis ligula ultrice risus an auctor tempus feugiat
-										   diam turpis impedit auctor felis and augue mauris blandit
-										</p>
-									</div>
-
-		 						</div>
-		 					</div>	<!-- END FEATURE BOX #6 -->	
-
-
-						</div>  <!-- End row -->  
-					</div>	<!-- END FEATURES WRAPPER -->
-
-
-				</div>     <!-- End container -->
-			</section>	<!-- END FEATURES -->
-
-
+			@include('frontend.sections.theme1.powerful_feature')
 
 
 			<!-- DIVIDER LINE -->
@@ -1006,104 +731,7 @@
 
 
 
-
-			<!-- FEATURES
-			============================================= -->
-			<section class="py-100 features-6 features-section division">
-				<div class="container">
-
-
-					<!-- SECTION TITLE -->	
-					<div class="row justify-content-center">	
-						<div class="col-md-8">
-							<div class="section-title text-center mb-80">	
-
-								<!-- Title -->	
-								<h2 class="h2-title">The Complete Solutions</h2>	
-
-								<!-- Text -->
-								<p class="p-lg">Ligula risus auctor tempus magna feugiat lacinia laoreet luctus</p>
-									
-							</div>	
-						</div>
-					</div>
-
-
-					<!-- FEATURES WRAPPER -->
-					<div class="fbox-wrapper text-center">
-						<div class="row row-cols-1 row-cols-md-3">
-
-
-							<!-- FEATURE BOX #1 -->
-		 					<div class="col">
-		 						<div class="fbox-6 fb-1 wow animate__animated animate__fadeInUp animate__delay-1">
-
-		 							<!-- Image -->
-									<div class="fbox-img h-180">
-										<img class="img-fluid" src="{{ asset('assets/theme1/images/f_05d.png') }}" alt="feature-image">
-									</div>
-
-									<!-- Text -->
-									<div class="fbox-txt">
-										<h6 class="h6-xl">Available Everywhere</h6>
-										<p>Egestas luctus augue undo ultrice quisque in lacus cursus feugiat eget ultrice 
-										   laoreet cubilia sagittis
-										</p>
-									</div>
-
-		 						</div>
-		 					</div>	<!-- END FEATURE BOX #1 -->	
-
-
-		 					<!-- FEATURE BOX #2 -->
-		 					<div class="col">
-		 						<div class="fbox-6 fb-2 wow animate__animated animate__fadeInUp animate__delay-2">
-
-		 							<!-- Image -->
-									<div class="fbox-img h-180">
-										<img class="img-fluid" src="{{ asset('assets/theme1/images/f_07d.png') }}" alt="feature-image">
-									</div>
-
-									<!-- Text -->
-									<div class="fbox-txt">
-										<h6 class="h6-xl">Intuitive Editing Tools</h6>
-										<p>Augue egestas luctus undo ultrice quisque in lacus cursus feugiat eget ultrice 
-										   sagittis cubilia laoreet
-										</p>
-									</div>
-
-		 						</div>
-		 					</div>	<!-- END FEATURE BOX #2 -->	
-
-
-		 					<!-- FEATURE BOX #3 -->
-		 					<div class="col">
-		 						<div class="fbox-6 fb-3 wow animate__animated animate__fadeInUp animate__delay-3">
-
-		 							<!-- Image -->
-									<div class="fbox-img h-180">
-										<img class="img-fluid" src="{{ asset('assets/theme1/images/f_08d.png') }}" alt="feature-image">
-									</div>
-
-									<!-- Text -->
-									<div class="fbox-txt">
-										<h6 class="h6-xl">AI-Powered Algorithm</h6>
-										<p>Egestas luctus augue undo ultrice quisque in lacus cursus feugiat eget ultrice 
-										   laoreet sagittis cubilia
-										</p>
-									</div>
-
-		 						</div>
-		 					</div>	<!-- END FEATURE BOX #3 -->	
-
-
-						</div>  <!-- End row -->  
-					</div>	<!-- END FEATURES WRAPPER -->
-
-
-				</div>     <!-- End container -->
-			</section>	<!-- END FEATURES -->
-
+			@include('frontend.sections.theme1.blog')
 
 
 
@@ -2127,6 +1755,7 @@
 			</section>	<!-- END NEWSLETTER -->
 
 
+@endif
 
 
 			<!-- DIVIDER LINE -->

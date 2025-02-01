@@ -7,41 +7,65 @@
    $featureImage          = @$featureContent->file?->where("type",'feature_image')->first();
 
 @endphp
-<section class="power-feature-section pb-110">
-    <div class="container">
-        <div class="row gy-5 align-items-center">
-            <div class="col-lg-6 pe-lg-5 order-lg-1 order-2">
-                <img src="{{imageURL($featureImage,'frontend',true,$featureImageSize)}}" class="rounded-5" alt="{{ @$featureImage->name ?? 'feature.jpg'}}">
-            </div>
-            <div class="col-lg-6 order-lg-2 order-1">
-                <div class="section-title-one text-start mb-60" data-aos="fade-right" data-aos-duration="1000">
+<!--Start Powerful Features -->
 
-                    <div class="subtitle">{{@$featureContent->value->sub_title}}</div>
-                    <h2>  @php echo (@$featureContent->value->title) @endphp </h2>
-                    <p> {{@$featureContent->value->description}}</p>
-               
-                </div>
-                <ul class="power-feature-list">
-                      @forelse($featureElements as $feature)
-                        <li>
-                            <div class="icon">
-                                <i class="bi bi-patch-check-fill"></i>
+            <!-- TEXT CONTENT
+            ============================================= -->
+            <section class="pt-100 ct-01 content-section division">
+                <div class="container">
+                    <div class="row d-flex align-items-center">
+
+
+                        <!-- IMAGE BLOCK -->
+                        <div class="col-md-6">
+                            <div class="img-block left-column wow animate__animated animate__fadeInRight">
+                                <img src="{{imageURL($featureImage,'frontend',true,$featureImageSize)}}" class="rounded-5 img-fluid" alt="{{ @$featureImage->name ?? 'feature.jpg'}}">
                             </div>
-                            <div class="content">
-                                <h5>
-                                    {{$feature->value->title}}
-                                </h5>
-                                <p> {{$feature->value->description}}</p>
+                        </div>
+
+
+                        <!-- TEXT BLOCK --> 
+                        <div class="col-md-6">
+                            <div class="txt-block right-column wow animate__animated animate__fadeInLeft">
+
+                                <!-- Title -->
+                                <div class="subtitle">{{@$featureContent->value->sub_title}}</div>
+                                <h2 class="h2-md">@php echo (@$featureContent->value->title) @endphp</h2>
+
+                                <!-- Text -->   
+                                <p>{{@$featureContent->value->description}}
+                                </p>
+
+                                <!-- Text -->   
+                                <p><ul class="power-feature-list">
+                                    @forelse($featureElements as $feature)
+                                    <li>
+                                        <div class="icon">
+                                            <i class="bi bi-patch-check-fill"></i>
+                                        </div>
+                                        <div class="content">
+                                            <h5>
+                                                {{$feature->value->title}}
+                                            </h5>
+                                            <p> {{$feature->value->description}}</p>
+                                        </div>
+                                    </li>
+                                    @empty
+                                    <li>
+                                        @include("frontend.partials.not_found")
+                                    </li>
+                                    @endforelse
+
+                                </ul>
+                            </p>
+
                             </div>
-                        </li>
-                     @empty
-                        <li>
-                            @include("frontend.partials.not_found")
-                        </li>
-                     @endforelse
-      
-                </ul>
-            </div>
-        </div>
-    </div>
-</section>
+                        </div>  <!-- END TEXT BLOCK --> 
+
+
+                    </div>    <!-- End row -->
+                </div>     <!-- End container -->
+            </section>  <!-- END TEXT CONTENT -->
+
+
+            <!-- End of Powerful Features -->
