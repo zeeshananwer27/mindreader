@@ -165,6 +165,14 @@
 @else
     <script nonce="{{ csp_nonce() }}" src="{{asset('assets/frontend/js/app.js')}}?v={{ time() }}"></script>
 @endif
+
+@if(request()->routeIs('user.book.edit.chapters'))
+    <script nonce="{{ csp_nonce() }}" src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script><!-- Header -->
+    <script nonce="{{ csp_nonce() }}" src="https://cdn.jsdelivr.net/npm/editorjs-undo"></script>
+    <script nonce="{{ csp_nonce() }}" src="https://cdn.jsdelivr.net/npm/simple-image-editorjs@1.4.0/dist/bundle.min.js"></script>
+
+    <script nonce="{{ csp_nonce() }}" src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+@endif
 <script nonce="{{ csp_nonce() }}" src="{{asset('assets/global/js/toastify-js.js')}}?v={{ time() }}"></script>
 <script nonce="{{ csp_nonce() }}" src="{{asset('assets/global/js/helper.js')}}?v={{ time() }}"></script>
 

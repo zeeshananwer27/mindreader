@@ -20,6 +20,10 @@ class ChapterTopic extends Model
         'content',
     ];
 
+    protected $casts = [
+        'content' => 'array',
+    ];
+
     protected static function booted(): void
     {
         static::creating(function (Model $model) {

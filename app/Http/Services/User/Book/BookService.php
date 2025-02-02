@@ -60,7 +60,7 @@ class BookService
                 'title' => $chapter['title'],
                 'content' => json_encode($chapter['sections']),
                 'book_id' => $book->id,
-                'has_image' => $chapter['has_image'] ?? false,
+                'has_image' => (!empty($chapter['hasImage']) && $chapter['hasImage'] == "1"),
                 'created_at' => now(),
                 'updated_at' => now(),
             ];

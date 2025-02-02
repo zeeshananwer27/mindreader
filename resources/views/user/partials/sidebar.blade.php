@@ -80,7 +80,7 @@
                         </li>
                         <li class="sidemenu-item">
                             <a href="#"
-                               class="sidemenu-link m-0 sidemenu-collapse {{request()->routeIs('user.book.chapters.*') ? 'active' :''}}">
+                               class="sidemenu-link m-0 sidemenu-collapse {{request()->routeIs('user.book.edit.chapters') ? 'active' :''}}">
                                 <div class="sidemenu-icon">
                                     <i class="bi bi-body-text"></i>
                                 </div>
@@ -89,13 +89,12 @@
                                 </span>
                             </a>
                             <div
-                                class="side-menu-dropdown @if(request()->routeIs('user.book.edit.chapters.*')) show-sideMenu @endif">
+                                class="side-menu-dropdown @if(request()->routeIs('user.book.edit.chapters')) show-sideMenu @endif">
                                 <ul class="sub-menu">
 
                                     @foreach($book->chapters as $chapter)
                                         <li class="sub-menu-item">
-                                            <a class="sidebar-menu-link {{request()->routeIs('user.book.edit.chapters', ['id' => $book->uid, 'chapter' => $chapter->uid]) ? 'active' :''}}"
-                                               href="{{route('user.book.edit.chapters',['id' => $book->uid, 'chapter' => $chapter->uid])}}">
+                                            <a class="sidebar-menu-link {{ request()->routeIs('user.book.edit.chapters') && request()->route('id') == $book->uid && request()->route('chapter') == $chapter->uid ? 'active' : '' }}"                                               href="{{route('user.book.edit.chapters',['id' => $book->uid, 'chapter' => $chapter->uid])}}">
                                                 <p>{{str_replace("Chapter ", "", $chapter->title)}}</p>
                                             </a>
                                         </li>

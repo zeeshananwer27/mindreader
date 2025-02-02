@@ -1,164 +1,196 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+@extends('layouts.master')
+@push('styles')
     <link href="{{asset('assets/global/css/editor.css')}}" rel="stylesheet">
     <script src="{{asset('assets/json-preview.js')}}"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-</head>
-<body>
-<div class="ce-example">
-    <div class="ce-example__content _ce-example__content--small">
-        <div id="editorjs"></div>
+@endpush
 
-        <div class="ce-example__button" id="saveButton">
-            editor.save()
+@section('content')
+    <div class="container mt-4">
+
+        <div class="row mt-5">
+            <div id="container" class="col-12 col-md-11 d-flex justify-content-center">
+                <div class="col-12 col-md-9">
+                    <div class="i-card  d-flex mb-4 align-items-center justify-content-between mx-2">
+                        <div class="flex-grow-1">
+                            <button
+                                class="btn btn-outline-secondary d-flex align-items-center justify-content-center px-2"
+                                {{ $currentChapterNumber == 1 ? 'disabled' :''}}>
+                                <i class="bi bi-arrow-left"></i>
+                            </button>
+                        </div>
+
+                        <div class="text-center">
+                            Chapter: {{$currentChapterNumber}} / {{$totalChapters}}
+                        </div>
+
+                        <div class="d-flex flex-grow-1 justify-content-end">
+                            <button
+                                class="btn btn-outline-secondary d-flex align-items-center justify-content-center px-2"
+                                {{ $currentChapterNumber == $totalChapters ? 'disabled' :''}}>
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="i-card-md py-4">
+                        <div class="d-flex w-100 align-items-center justify-content-between ps-5 pe-2 gap-2">
+                            <input type="text" required placeholder="Add Heading" value="{{$chapter->title}}"
+                                   class="form-control fs-3 py-1 px-4 ms-3 fw-medium text-black" name="title" disabled>
+
+                            <button type="button"
+                                    class="btn d-flex align-items-center justify-content-center px-1 border-0 hover-border"
+                                    id="edit-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="bi bi-pencil">
+                                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+                                    <path d="m15 5 4 4"></path>
+                                </svg>
+                            </button>
+
+                            <div id="action-buttons" class="d-none">
+                                <div class="d-flex">
+                                    <button type="button"
+                                            class="btn d-flex align-items-center justify-content-center px-1 border-0 hover-border"
+                                            id="save-btn">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="bi bi-check">
+                                            <path d="M20 6 9 17l-5-5"></path>
+                                        </svg>
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn d-flex align-items-center justify-content-center px-1 border-0 hover-border"
+                                            id="cancel-btn">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="bi bi-x">
+                                            <path d="M18 6 6 18"></path>
+                                            <path d="m6 6 12 12"></path>
+                                        </svg>
+                                    </button>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="editor"></div>
+                    </div>
+                </div>
+                <div class="position-fixed end-0 me-4 i-card border-start px-4 py-3">
+                    <h5 class="mt-2">AI Tools</h5>
+                    <p class="fs-6  mt-2">Total Words: <span id="words-count" class="text-muted"></span> words</p>
+
+                    <button type="button" class="btn btn-outline-secondary w-100 text-start my-2">
+                        <i class="bi bi-arrow-repeat me-2"></i> Regenerate Chapter
+                    </button>
+
+                    <hr>
+
+                    <h6 class="fw-semibold mb-3">AI Actions</h6>
+                    <div class="d-grid gap-2 mb-2">
+                        <button type="button" class="btn btn-outline-secondary text-start">
+                            <i class="bi bi-arrow-clockwise me-2"></i> Rewrite
+                        </button>
+
+                        <button type="button" class="btn btn-outline-secondary text-start">
+                            <i class="bi bi-spellcheck me-2"></i> Correct Grammar
+                        </button>
+
+                        <button type="button" class="btn btn-outline-secondary text-start">
+                            <i class="bi bi-chat-dots me-2"></i> Ask AI
+                        </button>
+
+                        <button type="button" class="btn btn-outline-secondary text-start">
+                            <i class="bi bi-file-earmark-text me-2"></i> Generate Paragraph
+                        </button>
+
+                        <button type="button" class="btn btn-outline-secondary text-start">
+                            <i class="bi bi-image me-2"></i> Generate Image
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-
     </div>
-    <div class="ce-example__output">
-        <pre class="ce-example__output-content" id="output"></pre>
+@endsection
 
-        <div class="ce-example__output-footer">
-            <a href="https://codex.so" style="font-weight: bold;">Made by CodeX</a>
-        </div>
-    </div>
-</div>
+@push('script-push')
 
-<script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script><!-- Header -->
-<script src="https://cdn.jsdelivr.net/npm/editorjs-undo"></script>
-<script src="https://cdn.jsdelivr.net/npm/simple-image-editorjs@1.4.0/dist/bundle.min.js"></script>
+    <script nonce="{{ csp_nonce() }}">
+        $(document).ready(function () {
+            let debounceTimer;
+            let editor = new EditorJS({
+                readOnly: false,
+                holder: 'editor',
+                inlineToolbar: true,
+                tools: {
+                    header: {
+                        class: Header,
+                        config: {
+                            placeholder: 'Enter a header',
+                            levels: [1, 2, 3, 4, 5, 6],
+                            defaultLevel: 3
+                        }
+                    },
+                    image: SimpleImage
+                },
 
-<script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
-
-<!-- Initialization -->
-<script>
-    var editor = new EditorJS({
-
-        readOnly: false,
-        holder: 'editorjs',
-        inlineToolbar: true,
-        tools: {
-            header: {
-                class: Header,
-                config: {
-                    placeholder: 'Enter a header',
-                    levels: [1, 2, 3, 4, 5, 6],
-                    defaultLevel: 3
+                defaultBlock: 'paragraph',
+                data: @json($chapter->chapterTopics),
+                onReady: function () {
+                    $('#container').removeClass('d-none');
+                    // saveButton.click();
+                    new Undo({editor});
+                    updateWordCount()
+                },
+                onChange: function (api, event) {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        updateWordCount();
+                    }, 1500);
                 }
-            },
-            image: SimpleImage
-        },
-
-        defaultBlock: 'paragraph',
-        data: {
-            blocks: [
-                {
-                    type: "header",
-                    data: {
-                        text: "Essssssssssss ssssssditor.js",
-                        level: 2
-                    }
-                },
-                {
-                    type: 'paragraph',
-                    data: {
-                        text: 'Hey. Meet the new Editor. On this page you can see it in action — try to edit this text. Source code of the page contains the example of connection and configuration.'
-                    }
-                },
-                {
-                    type: "header",
-                    data: {
-                        text: "Key features",
-                        level: 3
-                    }
-                },
-                {
-                    type: "header",
-                    data: {
-                        text: "What does it mean «block-styled editor»",
-                        level: 3
-                    }
-                },
-                {
-                    type: 'paragraph',
-                    data: {
-                        text: 'Workspace in classic editors is made of a single contenteditable element, used to create different HTML markups. Editor.js <mark class=\"cdx-marker\">workspace consists of separate Blocks: paragraphs, headings, images, lists, quotes, etc</mark>. Each of them is an independent contenteditable element (or more complex structure) provided by Plugin and united by Editor\'s Core.'
-                    }
-                },
-                {
-                    type: 'paragraph',
-                    data: {
-                        text: `There are dozens of <a href="https://github.com/editor-js">ready-to-use Blocks</a> and the <a href="https://editorjs.io/creating-a-block-tool">simple API</a> for creation any Block you need. For example, you can implement Blocks for Tweets, Instagram posts, surveys and polls, CTA-buttons and even games.`
-                    }
-                },
-                {
-                    type: "header",
-                    data: {
-                        text: "What does it mean clean data output",
-                        level: 3
-                    }
-                },
-                {
-                    type: 'paragraph',
-                    data: {
-                        text: 'Classic WYSIWYG-editors produce raw HTML-markup with both content data and content appearance. On the contrary, Editor.js outputs JSON object with data of each Block. You can see an example below'
-                    }
-                },
-                {
-                    type: 'paragraph',
-                    data: {
-                        text: `Given data can be used as you want: render with HTML for <code class="inline-code">Web clients</code>, render natively for <code class="inline-code">mobile apps</code>, create markup for <code class="inline-code">Facebook Instant Articles</code> or <code class="inline-code">Google AMP</code>, generate an <code class="inline-code">audio version</code> and so on.`
-                    }
-                },
-                {
-                    type: 'paragraph',
-                    data: {
-                        text: 'Clean data is useful to sanitize, validate and process on the backend.'
-                    }
-                },
-                {
-                    type: 'paragraph',
-                    data: {
-                        text: 'We have been working on this project more than three years. Several large media projects help us to test and debug the Editor, to make its core more stable. At the same time we significantly improved the API. Now, it can be used to create any plugin for any task. Hope you enjoy. 😏'
-                    }
-                },
-                {
-                    type: 'image',
-                    data: {
-                        url: '/assets/codex2x.png',
-                        caption: '',
-                        stretched: false,
-                        withBorder: true,
-                        withBackground: false,
-                    }
-                },
-            ]
-        },
-        onReady: function () {
-            saveButton.click();
-            new Undo({editor});
-        },
-        onChange: function (api, event) {
-            console.log('something changed', event);
-        }
-    });
-
-    const saveButton = document.getElementById('saveButton');
-
-    /**
-     * Saving example
-     */
-    saveButton.addEventListener('click', function () {
-        editor.save()
-            .then((savedData) => {
-                cPreview.show(savedData, document.getElementById("output"));
-            })
-            .catch((error) => {
-                console.error('Saving error', error);
             });
-    });
-</script>
-</body>
-</html>
+
+            $('#edit-btn').on('click', function () {
+                $('input[name="title"]').prop('disabled', false);
+                $(this).addClass('d-none');
+                $('#action-buttons').removeClass('d-none');
+            });
+
+            $('#cancel-btn').on('click', function () {
+                $('input[name="title"]').prop('disabled', true);
+                $('#edit-btn').removeClass('d-none');
+                $('#action-buttons').addClass('d-none');
+            });
+
+            $('#save-btn').on('click', function () {
+                $('input[name="title"]').prop('disabled', true);
+                $('#edit-btn').removeClass('d-none');
+                $('#action-buttons').addClass('d-none');
+            });
+
+            // const saveButton = document.getElementById('saveButton');
+            // saveButton.addEventListener('click', function () {
+            //     editor.save()
+            //         .then((savedData) => {
+            //             cPreview.show(savedData, document.getElementById("output"));
+            //         })
+            //         .catch((error) => {
+            //             console.error('Saving error', error);
+            //         });
+            // });
+
+            function updateWordCount() {
+                editor.save().then((outputData) => {
+                    let wordCount = 0;
+                    outputData.blocks.forEach((block) => {
+                        if (block.type === 'paragraph' || block.type === 'header') {
+                            const text = block.data.text || '';
+                            const words = text.trim().split(/\s+/);
+                            wordCount += words.length;
+                        }
+                    });
+                    $('#words-count').text(`${wordCount}`);
+                }).catch((error) => {
+                    console.error('Error retrieving blocks from editor: ', error);
+                });
+            }
+        });
+    </script>
+@endpush
