@@ -302,7 +302,7 @@ class BookController extends Controller
      */
     public function generateOutline(Request $request): JsonResponse
     {
-        $inputData['synopsis'] = $request->get('book_synopsis') ?? null;
+        $inputData['synopsis'] = $request->get('synopsis') ?? null;
         $inputData['author'] = $request->get('about_author') ?? null;
         $inputData['title'] = $request->get('title') ?? "";
         $inputData['language'] = $request->get('language') ?? "English";

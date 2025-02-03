@@ -141,9 +141,9 @@
 
                                 <!-- book synopsis -->
                                 <div class="form-group mb-4">
-                                    <label for="book_synopsis"
+                                    <label for="synopsis"
                                            class="form-label">{{ translate("Book Synopsis:") }}</label>
-                                    <textarea name="book_synopsis" id="book_synopsis" rows="7" class="form-control"
+                                    <textarea name="synopsis" id="synopsis" rows="7" class="form-control"
                                               placeholder="{{ translate("Details about book.") }}"></textarea>
 
                                 </div>
@@ -206,7 +206,7 @@
                             // Populate the synopsis field in step 2
                             $('#title').val(response.data.title);
                             $('#about_author').val(response.data.author);
-                            $('#book_synopsis').val(response.data.synopsis);
+                            $('#synopsis').val(response.data.synopsis);
 
                             // Show step 2
                             $('#step1').addClass('d-none');
@@ -233,7 +233,7 @@
                 // Collect form data
                 let formData = {
                     about_author: $('#about_author').val(),
-                    book_synopsis: $('#book_synopsis').val(),
+                    synopsis: $('#synopsis').val(),
                     title: $('#title').val(),
                     language: $('#language').val(),
                     _token: '{{ csrf_token() }}'  // Include CSRF token for Laravel security

@@ -116,7 +116,7 @@ class GenerateChapterDetailsJob implements ShouldQueue
                 'chapter_id' => $chapterId,
                 'order' => $index + 1,
                 'type' => $item['type'],
-                'content' => json_encode($item['data'],)
+                'content' => ($item['data'])
             ]);
         }
     }

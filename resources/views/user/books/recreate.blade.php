@@ -119,9 +119,9 @@
 
                                 <!-- book synopsis -->
                                 <div class="form-group mb-4">
-                                    <label for="booksynopsis"
+                                    <label for="synopsis"
                                            class="form-label">{{ translate("Book Synopsis:") }}</label>
-                                    <textarea name="book_synopsis" id="book_synopsis" rows="7" class="form-control"
+                                    <textarea name="synopsis" id="synopsis" rows="7" class="form-control"
                                               placeholder="{{ translate("Details about book.") }}"></textarea>
 
                                 </div>
@@ -175,7 +175,7 @@
                         if (response.status) {
                             $('#title').val(response.data.title);
                             $('#about_author').val(response.data.author);
-                            $('#book_synopsis').val(response.data.synopsis);
+                            $('#synopsis').val(response.data.synopsis);
 
                             $('#step1').addClass('d-none');
                             $('#step2').removeClass('d-none');
@@ -204,7 +204,7 @@
                     title: $('#title').val(),
                     length: "{{$book->length}}",
                     about_author: $('#about_author').val(),
-                    book_synopsis: $('#book_synopsis').val(),
+                    synopsis: $('#synopsis').val(),
                     author_profile_id: $('#authorProfile').val(),
                     language: $('#language').val(),
                     is_personal: $('#isPersonal').val(),
