@@ -141,7 +141,6 @@ class BookContentController extends Controller
         $genres = get_genre_list(); // Fetch available genres
         $languages = ['English', 'German']; // Language options
 
-//        dd($chapterTopics);
         return view('user.books.edit.chapter', [
             'meta_data' => $this->metaData(['title' => translate('Book Detail')]),
             'book' => $book,
@@ -264,7 +263,8 @@ class BookContentController extends Controller
             }
 
             // Delete topics not present in the input
-            ChapterTopic::whereNotIn('uid', $processedUids)->delete();
+            ChapterTopic::query()->where('chapter_id', $chapterId)
+                ->whereNotIn('uid', $processedUids)->delete();
 
             // Bulk Insert New Topics
             if (!empty($newTopics)) {

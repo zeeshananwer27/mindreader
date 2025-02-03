@@ -336,6 +336,7 @@ Route::middleware($globalMiddleware)->group(function () {
         Route::get('/{uid}/view', [FrontBookController::class, 'view'])->name('view');
         Route::get('/{uid}/preview', [FrontBookController::class, 'preview'])->name('preview');
     });
+    Route::get('/pdf/{id}', [FrontBookController::class, 'generatePdf']);
 
     Route::controller(FrontendController::class)->group(function () {
 

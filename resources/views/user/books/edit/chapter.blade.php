@@ -189,7 +189,7 @@
                                 try {
                                     const response = await fetch(block.data.url);
                                     const blob = await response.blob();
-                                    const file = new File([blob], `image_${Date.now()}_${block.id}.png`, { type: blob.type });
+                                    const file = new File([blob], `image_${Date.now()}_${block.id}.png`, {type: blob.type});
 
                                     formData.append(`images[${i}]`, file); // Append the image file
                                     block.data.temp_image_key = i; // Add temp key for server-side reference
@@ -201,6 +201,7 @@
 
                         formData.append('blocks', JSON.stringify(blocks));
                         formData.append('_token', '{{ csrf_token() }}');
+                        $('#saveChapterBtn').prop('disabled', true).text('Updating...');
 
                         $.ajax({
                             url: '{{ route('user.book.edit.chapters.update', ['id' => $book->uid, 'chapter' => $chapter->uid]) }}',
@@ -209,19 +210,18 @@
                             processData: false,      // Prevent jQuery from processing the data
                             contentType: false,      // Prevent jQuery from setting content type
                             success: function (response) {
-                                if (response.status) {
-                                    toastr.success(response.message);
-                                } else {
-                                    toastr.error(response.message || '{{ translate("Something went wrong. Please try again.") }}');
-                                }
+                                toastr(response.message, response.status ? "success" : "danger")
+                                $('#saveChapterBtn').prop('disabled', false).text('Update Chapter');
                             },
                             error: function (xhr, status, error) {
-                                toastr.error('{{ translate("An error occurred. Please try again.") }}');
+                                toastr("{{translate("An error occurred. Please try again.")}}", "danger")
+                                $('#saveChapterBtn').prop('disabled', false).text('Update Chapter');
                                 console.error("Error:", error);
                             }
                         });
                     })
                     .catch((error) => {
+                        $('#saveChapterBtn').prop('disabled', false).text('Update Chapter');
                         console.error('Saving error:', error);
                     });
 
