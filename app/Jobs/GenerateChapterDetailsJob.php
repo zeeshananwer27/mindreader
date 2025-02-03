@@ -109,14 +109,14 @@ class GenerateChapterDetailsJob implements ShouldQueue
 
     private function saveChapterDetails($chapterId, $parsedData): void
     {
-        Log::info("Finished processing chapters for book: ".json_encode($parsedData));
+        Log::info("Finished processing chapters for book: " . json_encode($parsedData));
 
         foreach ($parsedData as $index => $item) {
             ChapterTopic::create([
                 'chapter_id' => $chapterId,
                 'order' => $index + 1,
                 'type' => $item['type'],
-                'content' => $item['content'],
+                'content' => ($item['data'])
             ]);
         }
     }
@@ -137,15 +137,15 @@ class GenerateChapterDetailsJob implements ShouldQueue
                 if (str_starts_with($line, 'Topic:')) {
                     $currentTopic = substr($line, 7); //  remove "Topic:" keyword and get next string
                     $parsedData[] = [
-                        'type' => 'title',
-                        'content' => $currentTopic,
+                        'type' => 'header',
+                        'data' => ['text' => $currentTopic, 'level' => 3],
                     ];
                 } // Check if the line is a paragraph
                 elseif (str_starts_with($line, 'Paragraph:')) {
                     $paragraph = substr($line, 11); // remove "paragraph:" keyword and get next string
                     $parsedData[] = [
                         'type' => 'paragraph',
-                        'content' => $paragraph,
+                        'data' => ['text' => $paragraph],
                         'topic' => $currentTopic, //we can use this to associate with topic id
                     ];
                 }

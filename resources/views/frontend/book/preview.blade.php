@@ -1,97 +1,94 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $meta_data['title'] }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.1/turn.min.css">
-    <style>
-        /* Custom styles for the flipbook */
-        #flipbook {
-            width: 800px;
-            height: 600px;
-            margin: 0 auto;
-        }
-        .page {
-            background-color: #f9f9f9;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .page h3 {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .page h4 {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        .page p {
-            font-size: 16px;
-            line-height: 1.6;
-        }
-        .page img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-    </style>
-</head>
-<body>
-<div class="container my-5">
-    <!-- Flipbook Container -->
-    <div id="flipbook">
-        @foreach($book->chapters as $chapter)
-            <div class="page">
-                <h3>{{ $chapter->title }}</h3>
-                @foreach($chapter->topics->sortBy('order') as $topic)
-                    <div>
-                        @if($topic->type === 'title')
-                            <h4>{{ $topic->content }}</h4>
-                        @elseif($topic->type === 'paragraph')
-                            <p>{!! nl2br(e($topic->content)) !!}</p>
-                        @elseif($topic->type === 'image')
-                            <img src="{{ asset('storage/' . $topic->content) }}" alt="Image">
-                        @endif
+@extends('layouts.master')
+
+@section('content')
+    @include("frontend.partials.breadcrumb")
+    <div class="container mt-4">
+        <div class="row g-4 d-flex justify-content-center">
+            <div class="flip-book html-book" id="book">
+                <div>
+                    <!-- Cover Page -->
+                    <div class="page page-cover page-cover-top" data-density="hard">
+                        <div class="page-content">
+                            <h2>{{ $book->title }}</h2>
+                            <p>{{ $book->authorProfile->name ?? 'Unknown Author' }}</p>
+                            <p><strong>Genre:</strong> {{ $book->genre ?? 'Not Specified' }}</p>
+                            <p><strong>Language:</strong> {{ $book->language ?? 'English' }}</p>
+                        </div>
                     </div>
-                @endforeach
+
+                    <!-- Introduction -->
+                    @php
+                        $introPages = str_split(strip_tags($book->synopsis), 800); // Split intro for pagination
+                    @endphp
+                    @foreach($introPages as $intro)
+                        <div class="page">
+                            <div class="page-content">
+                                <h2 class="page-header">Introduction</h2>
+                                <p>{{ $intro }}</p>
+                            </div>
+                        </div>
+                    @endforeach
+
+                    <!-- Chapters and Topics -->
+                    @foreach($book->chapters as $chapter)
+                        <div class="page">
+                            <div class="page-content">
+                                <h2>Chapter {{ $loop->iteration }}: {{ $chapter->title }}</h2>
+                                @foreach($chapter->topics as $topic)
+
+                                    <h3>{{ $topic->title }}</h3>
+                                    @foreach($topic->content as $content)
+
+                                        @if($content['type'] == 'header')
+
+                                            <h{{ $content['content']['level'] }}>
+                                                {{ $content['content']['text'] }}
+                                            </h{{ $content['content']['level'] }}>
+
+                                        @elseif($content['type'] == 'paragraph')
+                                            @php
+                                                $paragraphPages = str_split(strip_tags($content['content']['text']), 1000);
+                                            @endphp
+                                            @foreach($paragraphPages as $paragraph)
+                                                <div class="page">
+                                                    <div class="page-content">
+                                                        <p>{{ $paragraph }}</p>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @elseif($content['type'] === 'image')
+                                            <img src="{{ $content['content']['url'] }}" alt="Image" class="img-fluid">
+                                        @endif
+                                    @endforeach
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+
+                    <!-- End Page -->
+                    <div class="page page-cover page-cover-bottom" data-density="hard">
+                        <div class="page-content">
+                            <h2>THE END</h2>
+                        </div>
+                    </div>
+                </div>
             </div>
-        @endforeach
+        </div>
     </div>
+@endsection
 
-    <!-- Navigation Buttons -->
-    <div class="text-center mt-4">
-        <button id="prev" class="btn btn-primary">Previous</button>
-        <button id="next" class="btn btn-primary">Next</button>
-    </div>
-</div>
-
-<!-- Scripts -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.1/turn.min.js"></script>
-<script>
-    $(document).ready(function () {
-        // Initialize the flipbook
-        $('#flipbook').turn({
-            width: 800,
-            height: 600,
-            autoCenter: true,
-            acceleration: true,
-            gradients: true,
+@push('script-push')
+    <script nonce="{{ csp_nonce() }}">
+        $(document).ready(function () {
+            const bookElement = document.getElementById('book');
+            if (bookElement) {
+                const pageFlip = new St.PageFlip(bookElement, {
+                    width: 400,
+                    height: 500,
+                    showCover: true
+                });
+                pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+            }
         });
-
-        // Navigation buttons
-        $('#prev').click(function() {
-            $('#flipbook').turn('previous');
-        });
-
-        $('#next').click(function() {
-            $('#flipbook').turn('next');
-        });
-    });
-</script>
-</body>
-</html>
+    </script>
+@endpush

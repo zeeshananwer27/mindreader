@@ -27,7 +27,7 @@ class BookRequest extends FormRequest
             'purpose' => 'required|string|max:1000',
             'target_audience' => 'required|string|max:1000',
             'language' => 'required|in:English,German',
-            'book_synopsis' => 'required',
+            'synopsis' => 'required',
             'about_author' => 'required',
             'chapters' => 'required|array|min:1',
             'chapters.*.title' => 'required|string',

@@ -4,12 +4,12 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Services\User\Book\BookService;
+use App\Models\Audiobook;
+use App\Models\AuthorProfile;
 use App\Models\Book;
 use App\Models\Chapter;
-use App\Models\AuthorProfile;
-use App\Models\Audiobook;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class BookContentController extends Controller
@@ -113,10 +113,26 @@ class BookContentController extends Controller
      * @param string $id
      * @return View
      */
-    public function chapters(string $id, string $chapter): View
+    public function chapters(string $id, string $chapterId): View
     {
-        $book = Book::with(['chapters.topics', 'authorProfile'])
-            ->where('uid', $id)->where('user_id', $this->user->id)->firstOrFail();
+        $book = Book::with(['chapters', 'authorProfile'])
+            ->where('uid', $id)
+            ->where('user_id', $this->user->id)
+            ->firstOrFail();
+
+        $chapter = $book->chapters()
+            ->where('uid', $chapterId)
+            ->with('topics')
+            ->firstOrFail();
+        $chapterTopics = $this->convertChapterToEditorJsFormat($chapter->topics);
+        $chapter->chapterTopics = $chapterTopics;
+
+        $totalChapters = $book->chapters->count();
+        $currentChapterNumber = $book->chapters->search(function ($item) use ($chapter) {
+                return $item->uid === $chapter->uid;
+            }) + 1;
+
+
         $authorProfiles = AuthorProfile::where('user_id', $this->user->id)->get();
         $genres = get_genre_list(); // Fetch available genres
         $languages = ['English', 'German']; // Language options
@@ -126,8 +142,83 @@ class BookContentController extends Controller
             'book' => $book,
             'authorProfiles' => $authorProfiles,
             'genres' => $genres,
+            'chapter' => $chapter,
             'book_languages' => $languages,
+            'currentChapterNumber' => $currentChapterNumber,
+            'totalChapters' => $totalChapters
         ]);
+    }
+
+    function convertChapterToEditorJsFormat($topics): array
+    {
+        $sortedTopics = collect($topics)->sortBy('order')->values()->toArray();
+        $blocks = [];
+
+        foreach ($sortedTopics as $topic) {
+            $block = [
+                'type' => $topic['type'], // 'header', 'paragraph', or 'image'
+                'data' => [],
+                'uid' => $topic['uid'],
+                'chapter_id' => $topic['chapter_id'],
+                'order' => $topic['order']
+            ];
+
+            if ($topic['type'] === 'header') {
+                $block['data'] = [
+                    'text' => $topic['content']['text'],
+                    'level' => $topic['content']['level'] ?? 3 // Default to level 3 if missing
+                ];
+            } elseif ($topic['type'] === 'paragraph') {
+                $block['data'] = [
+                    'text' => $topic['content']['text']
+                ];
+            } elseif ($topic['type'] === 'image') {
+                $block['data'] = [
+                    'file' => [
+                        'url' => $topic['content']['url']
+                    ]
+                ];
+            }
+
+            $blocks[] = $block;
+        }
+
+        return [
+            'blocks' => $blocks
+        ];
+    }
+
+    function updateChapterFromEditorJsFormat(array $editorJsResponse): array
+    {
+        $topics = [];
+
+        foreach ($editorJsResponse['data']['blocks'] as $block) {
+            $topic = [
+                'type' => $block['type'], // 'header', 'paragraph', or 'image'
+                'content' => [],
+                'uid' => $block['uid'],
+                'order' => $block['order']
+            ];
+
+            if ($block['type'] === 'header') {
+                $topic['content'] = [
+                    'text' => $block['data']['text'],
+                    'level' => $block['data']['level'] ?? 3
+                ];
+            } elseif ($block['type'] === 'paragraph') {
+                $topic['content'] = [
+                    'text' => $block['data']['text']
+                ];
+            } elseif ($block['type'] === 'image') {
+                $topic['content'] = [
+                    'url' => $block['data']['image']['url']
+                ];
+            }
+
+            $topics[] = $topic;
+        }
+
+        return $topics;
     }
 
     /**
@@ -218,4 +309,5 @@ class BookContentController extends Controller
 
         return back()->with('success', 'Audiobook generated successfully.');
     }
+
 }

@@ -42,8 +42,8 @@ class BookService
         $book->status = "draft";
         if (!$book->exists) {
             $book->user_id = auth()->id();
-            $book->genre = "-";
-            $book->length = "small";
+            $book->genre = $request->genre ?? "-";
+            $book->length = $request->length ?? "small";
         }
 
         $book->save();
@@ -60,7 +60,7 @@ class BookService
                 'title' => $chapter['title'],
                 'content' => json_encode($chapter['sections']),
                 'book_id' => $book->id,
-                'has_image' => $chapter['has_image'] ?? false,
+                'has_image' => (!empty($chapter['hasImage']) && $chapter['hasImage'] == "1"),
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
@@ -203,7 +203,7 @@ class BookService
     private function parseTextToJson($response): array
     {
         $lines = explode("\n", $response);
-        $jsonData = ["title" => "", "introduction" => ["content" => ""], "chapters" => [], "conclusion" => ["content" => ""]];
+        $jsonData = ["title" => "", "introduction" => "", "chapters" => [], "conclusion" => ""];
 
         $currentChapter = "";
         $currentSections = [];
@@ -232,16 +232,16 @@ class BookService
                 if (!empty($currentChapter)) {
                     $jsonData["chapters"][] = ["title" => trim($currentChapter), "sections" => $currentSections];
                 }
-                $currentChapter = trim($line);
+                $currentChapter = trim(preg_replace("/^Chapter [0-9]+:/", "", $line));
                 $currentSections = [];
                 $inIntroduction = false;
                 $inConclusion = false;
             } elseif ($inIntroduction) {
-                $jsonData["introduction"]["content"] .= " " . $line;
+                $jsonData["introduction"] .= " " . preg_replace("/^Introduction:\s*/", "", $line);
             } elseif ($inConclusion) {
-                $jsonData["conclusion"]["content"] .= " " . $line;
+                $jsonData["conclusion"] .= " " . $line;
             } elseif (!empty($currentChapter)) {
-                $currentSections[] = $line;
+                $currentSections[] = ltrim($line, '- ');
             }
         }
 

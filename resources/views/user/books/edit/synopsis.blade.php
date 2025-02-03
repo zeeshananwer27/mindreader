@@ -24,9 +24,9 @@
 
                     <!-- book synopsis -->
                     <div class="form-group mb-4">
-                        <label for="book_synopsis"
+                        <label for="synopsis"
                                class="form-label">{{ translate("Book Synopsis:") }}</label>
-                        <textarea name="book_synopsis" id="book_synopsis" rows="7" class="form-control"
+                        <textarea name="synopsis" id="synopsis" rows="7" class="form-control"
                                   placeholder="{{ translate("Details about book.") }}" disabled>{{$book->synopsis}}</textarea>
 
                     </div>

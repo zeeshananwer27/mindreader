@@ -31,11 +31,11 @@
                                 <div id="collapse-{{ $chapter->uid }}" class="accordion-collapse collapse"
                                      aria-labelledby="heading-{{ $chapter->uid }}" data-bs-parent="#chaptersAccordion">
                                     <div class="accordion-body">
-                                        @foreach($chapter->topics->where('type', 'title')->sortBy('order') as $topic)
+                                        @foreach($chapter->topics->where('type', 'header')->sortBy('order') as $topic)
                                             <div class="border-bottom py-2 pointer text-truncate section-link"
                                                  data-chapter="{{ $chapter->uid }}"
                                                  data-section="{{ $topic->uid }}">
-                                                {{ $topic->content }}
+                                                {{ $topic->content['text'] }}
                                             </div>
                                         @endforeach
                                     </div>
@@ -57,13 +57,13 @@
                             <div class="chapter-container mb-5">
                                 @foreach($chapter->topics->sortBy('order') as $topic)
                                     <div id="section-{{ $topic->uid }}" class="chapter-container-item">
-                                        @if($topic->type === 'title')
-                                            <h4 class="fw-bold mb-3">{{ $topic->content }}</h4>
+                                        @if($topic->type === 'header')
+                                            <h3 class="fw-bold mb-3">{{ $topic->content['text']  }}</h3>
                                         @elseif($topic->type === 'paragraph')
-                                            <p class="mb-3 text-justify">{!! nl2br(e($topic->content)) !!}</p>
+                                            <p class="mb-3 text-justify">{!! nl2br(e($topic->content['text'] )) !!}</p>
                                         @elseif($topic->type === 'image')
                                             <div class="my-3">
-                                                <img src="{{ asset('storage/' . $topic->content) }}" alt="Image" class="img-fluid rounded shadow">
+                                                <img src="{{ asset('storage/' . $topic->content['url'] ) }}" alt="Image" class="img-fluid rounded shadow">
                                             </div>
                                         @endif
                                     </div>
