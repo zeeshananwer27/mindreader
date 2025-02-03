@@ -63,7 +63,8 @@
                                             <p class="mb-3 text-justify">{!! nl2br(e($topic->content['text'] )) !!}</p>
                                         @elseif($topic->type === 'image')
                                             <div class="my-3">
-                                                <img src="{{ asset('storage/' . $topic->content['url'] ) }}" alt="Image" class="img-fluid rounded shadow">
+                                                <img src="{{ $topic->content['url'] }}" alt="Image"
+                                                     class="img-fluid rounded shadow">
                                             </div>
                                         @endif
                                     </div>
@@ -90,7 +91,7 @@
                 if (sectionUid) {
                     newUrl += "&section=" + sectionUid;
                 }
-                window.history.pushState({ path: newUrl }, "", newUrl);
+                window.history.pushState({path: newUrl}, "", newUrl);
             }
 
             function loadChapter(uid) {

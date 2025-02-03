@@ -8,8 +8,12 @@ use App\Models\Audiobook;
 use App\Models\AuthorProfile;
 use App\Models\Book;
 use App\Models\Chapter;
+use App\Models\ChapterTopic;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class BookContentController extends Controller
@@ -137,6 +141,7 @@ class BookContentController extends Controller
         $genres = get_genre_list(); // Fetch available genres
         $languages = ['English', 'German']; // Language options
 
+//        dd($chapterTopics);
         return view('user.books.edit.chapter', [
             'meta_data' => $this->metaData(['title' => translate('Book Detail')]),
             'book' => $book,
@@ -157,8 +162,8 @@ class BookContentController extends Controller
         foreach ($sortedTopics as $topic) {
             $block = [
                 'type' => $topic['type'], // 'header', 'paragraph', or 'image'
+                'id' => $topic['uid'],
                 'data' => [],
-                'uid' => $topic['uid'],
                 'chapter_id' => $topic['chapter_id'],
                 'order' => $topic['order']
             ];
@@ -174,9 +179,11 @@ class BookContentController extends Controller
                 ];
             } elseif ($topic['type'] === 'image') {
                 $block['data'] = [
-                    'file' => [
-                        'url' => $topic['content']['url']
-                    ]
+                    "caption" => $topic['content']['caption'] ?? "",
+                    "stretched" => $topic['content']['stretched'] ?? false,
+                    "withBorder" => $topic['content']['withBorder'] ?? false,
+                    "withBackground" => $topic['content']['withBackground'] ?? false,
+                    'url' => $topic['content']['url']
                 ];
             }
 
@@ -188,37 +195,82 @@ class BookContentController extends Controller
         ];
     }
 
-    function updateChapterFromEditorJsFormat(array $editorJsResponse): array
+    public function updateChapterData($bookId, $chapterId, Request $request): JsonResponse
     {
-        $topics = [];
+        $chapter = Chapter::query()
+            ->where('uid', $chapterId)
+            ->firstOrFail();
+        $blocks = json_decode($request->input('blocks'), true);
+        $uploadedImages = $request->file('images', []);
+        $this->syncEditorJsDataToDatabase($blocks, $chapter->id, $uploadedImages);
+        return response()->json([
+            'status' => true,
+            'message' => translate("Book Chapter updated successfully"),
+        ]);
+    }
 
-        foreach ($editorJsResponse['data']['blocks'] as $block) {
-            $topic = [
-                'type' => $block['type'], // 'header', 'paragraph', or 'image'
-                'content' => [],
-                'uid' => $block['uid'],
-                'order' => $block['order']
-            ];
+    function syncEditorJsDataToDatabase(array $editorData, $chapterId, $uploadedImages)
+    {
+        DB::transaction(function () use ($editorData, $chapterId, $uploadedImages) {
+            $inputIds = array_column($editorData, 'id');
 
-            if ($block['type'] === 'header') {
-                $topic['content'] = [
-                    'text' => $block['data']['text'],
-                    'level' => $block['data']['level'] ?? 3
-                ];
-            } elseif ($block['type'] === 'paragraph') {
-                $topic['content'] = [
-                    'text' => $block['data']['text']
-                ];
-            } elseif ($block['type'] === 'image') {
-                $topic['content'] = [
-                    'url' => $block['data']['image']['url']
-                ];
+            // Fetch existing topics using UIDs
+            $existingTopics = ChapterTopic::whereIn('uid', $inputIds)->get()->keyBy('uid');
+
+            $processedUids = [];
+            $newTopics = [];
+
+            foreach ($editorData as $index => $block) {
+                $uid = $block['id'];
+                $type = $block['type'];
+                $order = $index + 1;
+
+                // Handle image uploads
+                if ($type === 'image' && isset($block['data']['temp_image_key'])) {
+                    $tempKey = $block['data']['temp_image_key'];
+                    if (isset($uploadedImages[$tempKey])) {
+                        $image = $uploadedImages[$tempKey];
+                        $fileName = $image->getClientOriginalName();
+                        $filePath = $image->storeAs('uploads/books/chapters/images', $fileName, 'public');
+
+                        // Replace temp key with actual URL
+                        $block['data']['url'] = asset('storage/' . $filePath);
+                        unset($block['data']['temp_image_key']);
+                        $block['data'] = json_encode($block['data']);
+                    }
+                }
+                $content = ($block['data']);
+                if ($existingTopics->has($uid)) {
+                    // Update existing topic
+                    $topic = $existingTopics[$uid];
+                    $topic->type = $type;
+                    $topic->content = $content;
+                    $topic->order = $order;
+                    $topic->save();
+
+                    $processedUids[] = $uid; // Mark as processed
+                } else {
+                    // Prepare data for bulk insert
+                    $newTopics[] = [
+                        'uid' => Str::uuid(),
+                        'type' => $type,
+                        'chapter_id' => $chapterId,
+                        'content' => $content,
+                        'order' => $order,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ];
+                }
             }
 
-            $topics[] = $topic;
-        }
+            // Delete topics not present in the input
+            ChapterTopic::whereNotIn('uid', $processedUids)->delete();
 
-        return $topics;
+            // Bulk Insert New Topics
+            if (!empty($newTopics)) {
+                ChapterTopic::insert($newTopics);
+            }
+        });
     }
 
     /**

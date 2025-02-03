@@ -312,6 +312,7 @@ Route::middleware($globalMiddleware)->group(function () {
                 Route::get('/{id}/outlines', [BookContentController::class, 'outlines'])->name('outlines'); // Edit  outlines of existing book
                 Route::get('/{id}/cover', [BookContentController::class, 'cover'])->name('cover'); // Edit  cover of existing book
                 Route::get('/{id}/chapters/{chapter}', [BookContentController::class, 'chapters'])->name('chapters'); // Edit  chapter of existing book
+                Route::post('/{id}/chapters/{chapter}', [BookContentController::class, 'updateChapterData'])->name('chapters.update'); // update  chapter of existing book
                 Route::get('/{id}/audio', [BookContentController::class, 'audio'])->name('audio'); // Edit  audio of existing book
             });
 
