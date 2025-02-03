@@ -36,7 +36,7 @@ class ChapterTopic extends Model
      *
      * @return BelongsTo
      */
-    public function book(): BelongsTo
+    public function chapter(): BelongsTo
     {
         return $this->belongsTo(Chapter::class, 'chapter_id');
     }

@@ -1,7 +1,6 @@
 @extends('layouts.master')
 @push('styles')
     <link href="{{asset('assets/global/css/editor.css')}}" rel="stylesheet">
-    <script src="{{asset('assets/json-preview.js')}}"></script>
 @endpush
 
 @section('content')
@@ -40,7 +39,9 @@
                             <button type="button"
                                     class="btn d-flex align-items-center justify-content-center px-1 border-0 hover-border"
                                     id="edit-btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="bi bi-pencil">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round" class="bi bi-pencil">
                                     <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
                                     <path d="m15 5 4 4"></path>
                                 </svg>
@@ -51,7 +52,9 @@
                                     <button type="button"
                                             class="btn d-flex align-items-center justify-content-center px-1 border-0 hover-border"
                                             id="save-btn">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="bi bi-check">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                             stroke-linecap="round" stroke-linejoin="round" class="bi bi-check">
                                             <path d="M20 6 9 17l-5-5"></path>
                                         </svg>
                                     </button>
@@ -59,7 +62,9 @@
                                     <button type="button"
                                             class="btn d-flex align-items-center justify-content-center px-1 border-0 hover-border"
                                             id="cancel-btn">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="bi bi-x">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                             stroke-linecap="round" stroke-linejoin="round" class="bi bi-x">
                                             <path d="M18 6 6 18"></path>
                                             <path d="m6 6 12 12"></path>
                                         </svg>
@@ -70,6 +75,10 @@
                         </div>
 
                         <div id="editor"></div>
+
+                        <div class="d-flex justify-content-center mt-3">
+                            <button id="saveChapterBtn" type="button" class="btn btn-primary ">Update Chapter</button>
+                        </div>
                     </div>
                 </div>
                 <div class="position-fixed end-0 me-4 i-card border-start px-4 py-3">
@@ -165,16 +174,58 @@
                 $('#action-buttons').addClass('d-none');
             });
 
-            // const saveButton = document.getElementById('saveButton');
-            // saveButton.addEventListener('click', function () {
-            //     editor.save()
-            //         .then((savedData) => {
-            //             cPreview.show(savedData, document.getElementById("output"));
-            //         })
-            //         .catch((error) => {
-            //             console.error('Saving error', error);
-            //         });
-            // });
+            $('#saveChapterBtn').on('click', function () {
+                editor.save()
+                    .then(async (savedData) => {
+                        console.log(savedData);
+
+                        const formData = new FormData();
+                        const blocks = savedData.blocks; // Ensure we're using the correct data structure
+
+                        for (let i = 0; i < blocks.length; i++) {
+                            const block = blocks[i];
+
+                            if (block.type === 'image' && block.data.url.startsWith('blob:')) {
+                                try {
+                                    const response = await fetch(block.data.url);
+                                    const blob = await response.blob();
+                                    const file = new File([blob], `image_${Date.now()}_${block.id}.png`, { type: blob.type });
+
+                                    formData.append(`images[${i}]`, file); // Append the image file
+                                    block.data.temp_image_key = i; // Add temp key for server-side reference
+                                } catch (error) {
+                                    console.error('Image processing error:', error);
+                                }
+                            }
+                        }
+
+                        formData.append('blocks', JSON.stringify(blocks));
+                        formData.append('_token', '{{ csrf_token() }}');
+
+                        $.ajax({
+                            url: '{{ route('user.book.edit.chapters.update', ['id' => $book->uid, 'chapter' => $chapter->uid]) }}',
+                            type: 'POST',
+                            data: formData,
+                            processData: false,      // Prevent jQuery from processing the data
+                            contentType: false,      // Prevent jQuery from setting content type
+                            success: function (response) {
+                                if (response.status) {
+                                    toastr.success(response.message);
+                                } else {
+                                    toastr.error(response.message || '{{ translate("Something went wrong. Please try again.") }}');
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                toastr.error('{{ translate("An error occurred. Please try again.") }}');
+                                console.error("Error:", error);
+                            }
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('Saving error:', error);
+                    });
+
+            });
 
             function updateWordCount() {
                 editor.save().then((outputData) => {

@@ -56,7 +56,7 @@
                                     <h5 class="mb-0">Book Actions</h5>
                                 </div>
                                 <div class="card-body px-0 d-flex flex-column gap-2">
-                                    <a href="/home/books/mastering-full-stack-web-development-with-php/details"
+                                    <a href="{{ route('user.book.edit.details', $book->uid) }}"
                                        class="btn btn-secondary d-flex justify-content-center align-items-center w-100">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
                                              stroke="currentColor"
@@ -67,7 +67,7 @@
                                         </svg>
                                         Edit Book
                                     </a>
-                                    <a href="/home/books/mastering-full-stack-web-development-with-php/recreate"
+                                    <a href="{{ route('user.book.manager.recreate', $book->uid) }}"
                                        class="btn btn-secondary d-flex justify-content-center align-items-center w-100">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
                                              stroke="currentColor"
