@@ -7,8 +7,9 @@
     <style>
         body {
             font-family: serif;
+            background-color: ghostwhite;
             margin: 0;
-            padding: 0;
+            padding: 16px;
             color: #272424;
         }
 
@@ -24,7 +25,7 @@
         }
 
         .cover-page p {
-            font-size: 18px;
+            font-size: 20px;
             margin-bottom: 10px;
         }
 
@@ -70,7 +71,7 @@
 
         .toc-chapter-title {
             font-size: 24px;
-            color: #272424;
+            color: black;
             font-weight: bold;
         }
 
@@ -79,27 +80,26 @@
         }
 
         .chapter {
-            background-color: #ffffff;
+            background-color: ghostwhite;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             margin-top: 2px;
             margin-bottom: 2px;
         }
 
         .chapter h3 {
-            font-size: 32px;
+            font-size: 36px;
             text-align: center;
             margin-bottom: 8px;
         }
 
         .chapter h4 {
-            font-size: 24px;
+            font-size: 28px;
             margin-top: 16px;
             margin-bottom: 16px;
         }
 
         .chapter p {
-            font-size: 18px;
+            font-size: 22px;
             line-height: 1.6;
             margin-top: 8px;
             margin-bottom: 8px;
@@ -116,6 +116,7 @@
         }
 
         .chapter-content {
+            padding: 2px;
             display: block;
             width: 100%;
         }
@@ -133,9 +134,13 @@
         }
 
         @media print {
+            @page {
+                background-color: ghostwhite;
+                margin: 0; /* top, right, bottom, left */
+            }
             body {
                 margin: 0;
-                padding: 0;
+                padding: 4px;
             }
 
             .table-of-contents, .chapter {
@@ -193,5 +198,6 @@
         </div>
     @endforeach
 </div>
+<div style="page-break-before: always; height: 100vh;"></div>
 </body>
 </html>

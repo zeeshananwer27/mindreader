@@ -13,10 +13,6 @@
           rel="stylesheet" type="text/css"/>
     <link nonce="{{ csp_nonce() }}" href="{{asset('assets/global/css/bootstrap-icons.min.css')}}?v={{ time() }}"
           rel="stylesheet" type="text/css"/>
-    @if(request()->routeIs('book.preview'))
-        <link nonce="{{ csp_nonce() }}" href="{{asset('assets/global/css/book.css')}}?v={{ time() }}" rel="stylesheet"
-              type="text/css"/>
-    @endif
     <link nonce="{{ csp_nonce() }}" href="{{asset('assets/global/css/line-awesome.min.css')}}?v={{ time() }}"
           rel="stylesheet" type="text/css"/>
     <link nonce="{{ csp_nonce() }}" href="{{asset('assets/frontend/css/swiper-bundle.min.css')}}?v={{ time() }}"
@@ -175,8 +171,6 @@
 @endif
 <script nonce="{{ csp_nonce() }}" src="{{asset('assets/global/js/toastify-js.js')}}?v={{ time() }}"></script>
 <script nonce="{{ csp_nonce() }}" src="{{asset('assets/global/js/helper.js')}}?v={{ time() }}"></script>
-
-<script nonce="{{ csp_nonce() }}" src="{{asset('assets/global/js/page-flip.browser.js')}}?v={{ time() }}"></script>
 
 <script nonce="{{ csp_nonce() }}">
     "use strict";
