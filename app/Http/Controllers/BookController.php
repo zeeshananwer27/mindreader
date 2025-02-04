@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class BookController extends Controller
@@ -62,18 +64,17 @@ class BookController extends Controller
     {
         $book = Book::with(['chapters.topics', 'authorProfile'])
             ->status('active')->where('uid', $id)->firstOrfail();
-
+        $bookUrl = $this->generatePdf($book->uid);
         return view('frontend.book.preview', [
             'meta_data' => $this->metaData(["title" => $book->title]),
             'book' => $book,
+            'file_url' => $bookUrl,
             'breadcrumbs' => ['Home' => 'home', $book->title => null],
         ]);
     }
 
-
-    public function generatePdf($id)
+    public function generatePdf($id, $isDownload = false): Response|string
     {
-        // Fetch the book with its chapters and topics
         $book = Book::with(['chapters.topics', 'authorProfile'])
             ->where('uid', $id)
             ->firstOrFail();
@@ -100,9 +101,20 @@ class BookController extends Controller
             'tableOfContentsHtml' => $tableOfContentsHtml
         ])->render();
 
-        // Generate the PDF
         $pdf = PDF::loadHTML($pdfContent);
 
-        return $pdf->download('book_content.pdf');
+        if ($isDownload) {
+            return $pdf->download('book_content.pdf');
+        }
+        else{
+            $fileName = "{$book->uid}.pdf";
+            $filePath = "uploads/books/{$book->uid}/{$fileName}";
+
+            $book->book_url = $filePath;
+            $book->save();
+
+            Storage::disk('public')->put($filePath, $pdf->output());
+            return $filePath;
+        }
     }
 }

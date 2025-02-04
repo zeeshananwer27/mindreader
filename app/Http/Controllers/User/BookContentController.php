@@ -208,9 +208,9 @@ class BookContentController extends Controller
         ]);
     }
 
-    function syncEditorJsDataToDatabase(array $editorData, $chapterId, $uploadedImages)
+    function syncEditorJsDataToDatabase(array $editorData, $bookUid, $chapterId, $uploadedImages)
     {
-        DB::transaction(function () use ($editorData, $chapterId, $uploadedImages) {
+        DB::transaction(function () use ($editorData, $bookUid, $chapterId, $uploadedImages) {
             $inputIds = array_column($editorData, 'id');
 
             // Fetch existing topics using UIDs
@@ -231,7 +231,7 @@ class BookContentController extends Controller
                         if (isset($uploadedImages[$tempKey])) {
                             $image = $uploadedImages[$tempKey];
                             $fileName = $image->getClientOriginalName();
-                            $filePath = $image->storeAs('uploads/books/chapters/images', $fileName, 'public');
+                            $filePath = $image->storeAs("uploads/books/{$bookUid}/chapters/images", $fileName, 'public');
 
                             // Replace temp key with actual URL
                             $block['data']['url'] = 'storage/' . $filePath;
