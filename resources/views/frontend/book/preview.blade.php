@@ -1,94 +1,77 @@
 @extends('layouts.master')
+@push('styles')
+    <link nonce="{{ csp_nonce() }}" href="{{asset('assets/book/css/dflip.min.css')}}?v={{ time() }}" rel="stylesheet"
+          type="text/css"/>
+    <link nonce="{{ csp_nonce() }}" href="{{asset('assets/book/css/themify-icons.min.css')}}?v={{ time() }}"
+          rel="stylesheet"
+          type="text/css"/>
 
+    <style>
+        .annotationDiv {
+            border-top: 1px solid #f8f9fb;
+            border-left: 1px solid #f8f9fb;
+        }
+
+        .df-share-button.ti-whatsapp:before {
+            content: url('https://api.iconify.design/simple-icons:whatsapp.svg?color=%23777&width=20&height=20');
+        }
+
+        .df-share-button.df-icon-close {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+        }
+
+    </style>
+@endpush
 @section('content')
     @include("frontend.partials.breadcrumb")
     <div class="container mt-4">
         <div class="row g-4 d-flex justify-content-center">
-            <div class="flip-book html-book" id="book">
-                <div>
-                    <!-- Cover Page -->
-                    <div class="page page-cover page-cover-top" data-density="hard">
-                        <div class="page-content">
-                            <h2>{{ $book->title }}</h2>
-                            <p>{{ $book->authorProfile->name ?? 'Unknown Author' }}</p>
-                            <p><strong>Genre:</strong> {{ $book->genre ?? 'Not Specified' }}</p>
-                            <p><strong>Language:</strong> {{ $book->language ?? 'English' }}</p>
-                        </div>
-                    </div>
 
-                    <!-- Introduction -->
-                    @php
-                        $introPages = str_split(strip_tags($book->synopsis), 800); // Split intro for pagination
-                    @endphp
-                    @foreach($introPages as $intro)
-                        <div class="page">
-                            <div class="page-content">
-                                <h2 class="page-header">Introduction</h2>
-                                <p>{{ $intro }}</p>
-                            </div>
-                        </div>
-                    @endforeach
+            @php
+                $title = str_replace(' ', '_', $book->title)
+            @endphp
 
-                    <!-- Chapters and Topics -->
-                    @foreach($book->chapters as $chapter)
-                        <div class="page">
-                            <div class="page-content">
-                                <h2>Chapter {{ $loop->iteration }}: {{ $chapter->title }}</h2>
-                                @foreach($chapter->topics as $topic)
-
-                                    <h3>{{ $topic->title }}</h3>
-                                    @foreach($topic->content as $content)
-
-                                        @if($content['type'] == 'header')
-
-                                            <h{{ $content['content']['level'] }}>
-                                                {{ $content['content']['text'] }}
-                                            </h{{ $content['content']['level'] }}>
-
-                                        @elseif($content['type'] == 'paragraph')
-                                            @php
-                                                $paragraphPages = str_split(strip_tags($content['content']['text']), 1000);
-                                            @endphp
-                                            @foreach($paragraphPages as $paragraph)
-                                                <div class="page">
-                                                    <div class="page-content">
-                                                        <p>{{ $paragraph }}</p>
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        @elseif($content['type'] === 'image')
-                                            <img src="{{ $content['content']['url'] }}" alt="Image" class="img-fluid">
-                                        @endif
-                                    @endforeach
-                                @endforeach
-                            </div>
-                        </div>
-                    @endforeach
-
-                    <!-- End Page -->
-                    <div class="page page-cover page-cover-bottom" data-density="hard">
-                        <div class="page-content">
-                            <h2>THE END</h2>
-                        </div>
-                    </div>
-                </div>
+            <div class="_df_book"
+                 height="700"
+                 source="{{ asset('storage/' .$book->book_url) }}"
+                 id="{{$title}}"
+            >
             </div>
         </div>
     </div>
 @endsection
 
 @push('script-push')
+
+    {{--    <script nonce="{{ csp_nonce() }}" src="{{asset('assets/book/js/libs/jquery.min.js')}}?v={{ time() }}"></script>--}}
+    <script nonce="{{ csp_nonce() }}" src="{{asset('assets/book/js/libs/three.min.js')}}?v={{ time() }}"></script>
+    <script nonce="{{ csp_nonce() }}" src="{{asset('assets/book/js/libs/compatibility.js')}}?v={{ time() }}"></script>
+    <script nonce="{{ csp_nonce() }}" src="{{asset('assets/book/js/libs/mockup.min.js')}}?v={{ time() }}"></script>
+    <script nonce="{{ csp_nonce() }}" src="{{asset('assets/book/js/libs/pdf.min.js')}}?v={{ time() }}"></script>
+    <script nonce="{{ csp_nonce() }}" src="{{asset('assets/book/js/dflip.min.js')}}?v={{ time() }}"></script>
+
     <script nonce="{{ csp_nonce() }}">
-        $(document).ready(function () {
-            const bookElement = document.getElementById('book');
-            if (bookElement) {
-                const pageFlip = new St.PageFlip(bookElement, {
-                    width: 400,
-                    height: 500,
-                    showCover: true
-                });
-                pageFlip.loadFromHTML(document.querySelectorAll('.page'));
-            }
-        });
+        var option_{{$title}} = {
+            webgl: true,
+            sharePrefix: "{{$book->title}}",
+            hard: "cover",
+        };
+
     </script>
+
+    <script>
+
+        jQuery(function() {
+
+            DFLIP.defaults.onReady = function(flipbook){
+                console.log("flipbook ready");
+                flipbook.ui.fullScreen.trigger("click");
+            }
+
+        });
+
+    </script>
+
 @endpush
