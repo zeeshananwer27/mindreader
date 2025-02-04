@@ -182,7 +182,7 @@ class BookContentController extends Controller
                     "stretched" => $topic['content']['stretched'] ?? false,
                     "withBorder" => $topic['content']['withBorder'] ?? false,
                     "withBackground" => $topic['content']['withBackground'] ?? false,
-                    'url' => $topic['content']['url']
+                    'url' => asset($topic['content']['url'])
                 ];
             }
 
@@ -225,17 +225,21 @@ class BookContentController extends Controller
                 $order = $index + 1;
 
                 // Handle image uploads
-                if ($type === 'image' && isset($block['data']['temp_image_key'])) {
-                    $tempKey = $block['data']['temp_image_key'];
-                    if (isset($uploadedImages[$tempKey])) {
-                        $image = $uploadedImages[$tempKey];
-                        $fileName = $image->getClientOriginalName();
-                        $filePath = $image->storeAs('uploads/books/chapters/images', $fileName, 'public');
+                if ($type === 'image') {
+                    if (isset($block['data']['temp_image_key'])) {
+                        $tempKey = $block['data']['temp_image_key'];
+                        if (isset($uploadedImages[$tempKey])) {
+                            $image = $uploadedImages[$tempKey];
+                            $fileName = $image->getClientOriginalName();
+                            $filePath = $image->storeAs('uploads/books/chapters/images', $fileName, 'public');
 
-                        // Replace temp key with actual URL
-                        $block['data']['url'] = asset('storage/' . $filePath);
-                        unset($block['data']['temp_image_key']);
-                        $block['data'] = json_encode($block['data']);
+                            // Replace temp key with actual URL
+                            $block['data']['url'] = 'storage/' . $filePath;
+                            unset($block['data']['temp_image_key']);
+                            $block['data'] = json_encode($block['data']);
+                        }
+                    } else {
+                        $block['data']['url'] = strstr($block['data']['url'], 'storage/');
                     }
                 }
                 $content = ($block['data']);

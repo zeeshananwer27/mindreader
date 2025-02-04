@@ -79,42 +79,51 @@
         }
 
         .chapter {
-            margin-top: 50px;
-            padding: 20px;
             background-color: #ffffff;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
+            margin-top: 2px;
+            margin-bottom: 2px;
         }
 
         .chapter h3 {
             font-size: 32px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 8px;
         }
 
         .chapter h4 {
             font-size: 24px;
-            margin-top: 20px;
-            margin-bottom: 10px;
+            margin-top: 16px;
+            margin-bottom: 16px;
         }
 
         .chapter p {
             font-size: 18px;
             line-height: 1.6;
-            margin-bottom: 15px;
+            margin-top: 8px;
+            margin-bottom: 8px;
         }
 
         .chapter img {
             display: block;
-            margin: 50px auto;
-            max-width: 80%;
+            margin-top: -20px;
+            margin-bottom: 60px;
+            max-width: 100%;
+            object-fit: cover;
+            vertical-align: bottom;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .chapter-content {
+            display: block;
+            width: 100%;
         }
 
         /* Footer with page number */
         footer {
+            padding: 0;
+            margin: 0;
             bottom: 0;
             text-align: center;
             font-size: 14px;
@@ -125,11 +134,8 @@
 
         @media print {
             body {
-                counter-reset: page 3;
-            }
-
-            footer {
-                display: block;
+                margin: 0;
+                padding: 0;
             }
 
             .table-of-contents, .chapter {
@@ -137,8 +143,8 @@
             }
         }
 
-        footer::before {
-            content: "Page " counter(page);
+        .footer-container footer::before {
+            content: counter(page);
             font-size: 12px;
             color: #7f8c8d;
         }
@@ -163,26 +169,29 @@
     <h1>Table of Contents</h1>
     {!! $tableOfContentsHtml !!}
 </div>
+<div class="footer-container">
+    <!-- Chapters -->
+    @foreach ($book->chapters as $index=> $chapter)
+        <div class="chapter" id="chapter-{{ $chapter->id }}">
+            <h3>Chapter {{($index+1)}}: {{ $chapter->title }}</h3>
 
-<!-- Chapters -->
-@foreach ($book->chapters as $chapter)
-    <div class="chapter" id="chapter-{{ $chapter->id }}">
-        <h3>{{ $chapter->title }}</h3>
-
-        @foreach($chapter->topics->sortBy('order') as $topic)
-            @if($topic->type === 'header')
-                <h4 class="fw-bold mb-3">{{ $topic->content['text'] }}</h4>
-            @elseif($topic->type === 'paragraph')
-                <p class="mb-3 text-justify">{!! nl2br(e($topic->content['text'])) !!}</p>
-            @elseif($topic->type === 'image')
-                <div class="my-3">
-                    <img src="{{ $topic->content['url'] }}" alt="Image" class="img-fluid rounded shadow">
-                {{$topic->content['url'] }}
-                </div>
-            @endif
-        @endforeach
-    </div>
-@endforeach
-<footer></footer>
+            <div class="chapter-content">
+                @foreach($chapter->topics->sortBy('order') as $topic)
+                    @if($topic->type === 'header')
+                        <h4 class="fw-bold mb-3">{{ $topic->content['text'] }}</h4>
+                    @elseif($topic->type === 'paragraph')
+                        <p>{!! nl2br(e($topic->content['text'])) !!}</p>
+                    @elseif($topic->type === 'image')
+                        @php
+                            $topicImage = 'data:image/jpeg;base64,' . base64_encode(file_get_contents($topic->content['url']));
+                        @endphp
+                        <img src="{{ $topicImage }}" alt="Image">
+                    @endif
+                    <footer></footer>
+                @endforeach
+            </div>
+        </div>
+    @endforeach
+</div>
 </body>
 </html>

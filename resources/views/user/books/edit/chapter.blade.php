@@ -212,6 +212,9 @@
                             success: function (response) {
                                 toastr(response.message, response.status ? "success" : "danger")
                                 $('#saveChapterBtn').prop('disabled', false).text('Update Chapter');
+                                if (response.status){
+                                    window.location.reload();
+                                }
                             },
                             error: function (xhr, status, error) {
                                 toastr("{{translate("An error occurred. Please try again.")}}", "danger")
