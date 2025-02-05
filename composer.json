@@ -21,6 +21,7 @@
         "janu-software/facebook-php-sdk": "^0.2.1",
         "karim007/laravel-bkash-tokenize": "^1.0",
         "laravel/framework": "^10.10",
+        "laravel/reverb": "^1.4",
         "laravel/sanctum": "^3.2",
         "laravel/slack-notification-channel": "^2.5",
         "laravel/socialite": "^5.5",

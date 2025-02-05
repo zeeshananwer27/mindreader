@@ -8,6 +8,8 @@
     <title>{{@site_settings("user_site_name",site_settings('site_name'))}} {{site_settings('title_separator')}} {{Arr::get($meta_data,"title",trans("default.home"))}}</title>
     @include('partials.meta_content')
 
+    @vite('resources/js/app.js')
+
     <link nonce="{{ csp_nonce() }}" rel="shortcut icon" href="{{imageURL(@site_logo('favicon')->file,'favicon',true)}}">
     <link nonce="{{ csp_nonce() }}" href="{{asset('assets/global/css/bootstrap.min.css')}}?v={{ time() }}"
           rel="stylesheet" type="text/css"/>
@@ -163,9 +165,11 @@
 @endif
 
 @if(request()->routeIs('user.book.edit.chapters'))
-    <script nonce="{{ csp_nonce() }}" src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script><!-- Header -->
+    <script nonce="{{ csp_nonce() }}" src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
+    <!-- Header -->
     <script nonce="{{ csp_nonce() }}" src="https://cdn.jsdelivr.net/npm/editorjs-undo"></script>
-    <script nonce="{{ csp_nonce() }}" src="https://cdn.jsdelivr.net/npm/simple-image-editorjs@1.4.0/dist/bundle.min.js"></script>
+    <script nonce="{{ csp_nonce() }}"
+            src="https://cdn.jsdelivr.net/npm/simple-image-editorjs@1.4.0/dist/bundle.min.js"></script>
 
     <script nonce="{{ csp_nonce() }}" src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
 @endif
@@ -422,6 +426,15 @@
     function hideLoadingSwal() {
         Swal.close();
     }
+
+    console.log('Book.User.' + {{auth()->user()->uid}})
+    @if(auth()->id())
+    window.Echo.private()
+        .listen('.book.generated', (event) => {
+            console.log(event)
+        })
+
+    @endif
 </script>
 
 @include('partials.notify')

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Events\BookGenerated;
 use App\Http\Services\User\Book\BookService;
 use App\Models\Book;
 use App\Models\ChapterTopic;
@@ -103,6 +104,7 @@ class GenerateChapterDetailsJob implements ShouldQueue
         $this->book->update([
             'status' => "active",
         ]);
+        broadcast(new BookGenerated($this->book));
 
         Log::info("Finished processing chapters for book: {$this->book->id}");
     }
